@@ -102,6 +102,7 @@ export const UpcomingEventsPage = ({
         onJoinVolunteerClick={onJoinVolunteerClick}
         onDashboardClick={onDashboardClick}
         onProfileClick={onProfileClick}
+        onFavouriteClick={onProfileClick}
       />
 
       <div className="pt-24 pb-12">

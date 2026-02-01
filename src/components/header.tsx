@@ -10,9 +10,10 @@ interface HeaderProps {
   onEventsClick?: () => void;
   onJoinCareFacilityClick?: () => void;
   onJoinFoundationClick?: () => void;
+  onFavouriteClick?: () => void;
 }
 
-export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick, onEventsClick, onJoinCareFacilityClick, onJoinFoundationClick }: HeaderProps) => {
+export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick, onEventsClick, onJoinCareFacilityClick, onJoinFoundationClick, onFavouriteClick }: HeaderProps) => {
   const { user, userProfile, signOut } = useAuth();
   const [joinOpen, setJoinOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -55,6 +56,13 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
             >
               About us
             </a>
+
+            <button
+              onClick={onFavouriteClick}
+              className="px-4 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold transition-colors"
+            >
+              Favourite
+            </button>
 
             <button
               onClick={onDashboardClick}
@@ -259,6 +267,16 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
             >
               About us
             </a>
+
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                onFavouriteClick?.();
+              }}
+              className="w-full text-left px-4 py-3 text-gray-700 hover:bg-red-50 rounded-lg font-bold transition-colors"
+            >
+              Favourite
+            </button>
 
             <button
               onClick={() => {
