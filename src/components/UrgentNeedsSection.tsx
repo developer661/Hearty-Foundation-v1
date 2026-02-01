@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapPin, AlertCircle, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { FavoriteButton } from './FavoriteButton';
 
 interface UrgentNeed {
   id: string;
@@ -83,12 +84,15 @@ export const UrgentNeedsSection = ({ onViewAllClick }: UrgentNeedsSectionProps) 
             >
               <div className="p-4 h-full flex flex-col">
                 <div className="flex items-start justify-between mb-2">
-                  <div className="bg-red-100 rounded-full p-1.5">
-                    <AlertCircle className="w-4 h-4 text-red-600" />
+                  <div className="flex items-center gap-2">
+                    <div className="bg-red-100 rounded-full p-1.5">
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                    </div>
+                    <span className="text-xs font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
+                      URGENT
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
-                    URGENT
-                  </span>
+                  <FavoriteButton itemId={need.id} itemType="urgent_need" />
                 </div>
 
                 <h3 className="text-base font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors line-clamp-2 flex-shrink-0">

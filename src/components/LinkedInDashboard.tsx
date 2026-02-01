@@ -8,9 +8,10 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface LinkedInDashboardProps {
   onBack: () => void;
+  onProfileClick?: () => void;
 }
 
-export const LinkedInDashboard = ({ onBack }: LinkedInDashboardProps) => {
+export const LinkedInDashboard = ({ onBack, onProfileClick }: LinkedInDashboardProps) => {
   const { userProfile } = useAuth();
 
   if (!userProfile) {
@@ -51,7 +52,7 @@ export const LinkedInDashboard = ({ onBack }: LinkedInDashboardProps) => {
         )}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-3">
-            <UserProfileSidebar user={userProfile} />
+            <UserProfileSidebar user={userProfile} onProfileClick={onProfileClick} />
           </div>
 
           <div className="lg:col-span-6">

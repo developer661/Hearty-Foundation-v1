@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Calendar, MapPin, Users, Clock, ChevronDown } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { FavoriteButton } from '../FavoriteButton';
 
 interface Event {
   id: string;
@@ -182,9 +183,12 @@ export const UpcomingEvents = ({ userLocation, isReadOnly = false }: UpcomingEve
             >
               <div className="flex items-start justify-between mb-2">
                 <h4 className="font-bold text-gray-900 text-sm line-clamp-2 flex-1">{event.title}</h4>
-                <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-0.5 rounded ml-2">
-                  {formatEventDate(event.event_date)}
-                </span>
+                <div className="flex items-center gap-1 ml-2">
+                  <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-0.5 rounded">
+                    {formatEventDate(event.event_date)}
+                  </span>
+                  <FavoriteButton itemId={event.id} itemType="event" />
+                </div>
               </div>
 
               <div className="space-y-1 mb-3">

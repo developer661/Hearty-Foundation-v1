@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle } from 'lucide-react';
+import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle, Heart } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -23,10 +23,20 @@ interface AssignedOpportunity {
   created_at: string;
 }
 
+interface FavoriteItem {
+  id: string;
+  item_id: string;
+  item_type: 'urgent_need' | 'event';
+  item_title?: string;
+  item_location?: string;
+  created_at: string;
+}
+
 export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
   const { userProfile } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [opportunities, setOpportunities] = useState<AssignedOpportunity[]>([]);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [showTooltip, setShowTooltip] = useState(false);
 
   const getVerificationStatusLabel = (status: string) => {
@@ -76,8 +86,45 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
       .eq('user_id', userProfile.id)
       .order('created_at', { ascending: false });
 
+    const { data: favoritesData } = await supabase
+      .from('favorites')
+      .select('*')
+      .eq('user_id', userProfile.id)
+      .order('created_at', { ascending: false });
+
     if (activitiesData) setActivities(activitiesData);
     if (opportunitiesData) setOpportunities(opportunitiesData);
+
+    if (favoritesData) {
+      const enrichedFavorites = await Promise.all(
+        favoritesData.map(async (fav) => {
+          if (fav.item_type === 'urgent_need') {
+            const { data: needData } = await supabase
+              .from('opportunities')
+              .select('title, location')
+              .eq('id', fav.item_id)
+              .maybeSingle();
+            return {
+              ...fav,
+              item_title: needData?.title,
+              item_location: needData?.location
+            };
+          } else {
+            const { data: eventData } = await supabase
+              .from('events')
+              .select('title, location')
+              .eq('id', fav.item_id)
+              .maybeSingle();
+            return {
+              ...fav,
+              item_title: eventData?.title,
+              item_location: eventData?.location
+            };
+          }
+        })
+      );
+      setFavorites(enrichedFavorites);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -321,6 +368,40 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
                 ))
               ) : (
                 <p className="text-gray-500 text-sm">No recent activities</p>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Heart className="w-5 h-5 text-red-600" />
+              My Favourites
+            </h2>
+            <div className="space-y-3">
+              {favorites.length > 0 ? (
+                favorites.map((favorite) => (
+                  <div key={favorite.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-red-300 transition-colors">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-gray-900 flex-1">{favorite.item_title || 'Unknown Item'}</h3>
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                        favorite.item_type === 'urgent_need' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                      }`}>
+                        {favorite.item_type === 'urgent_need' ? 'Urgent Need' : 'Event'}
+                      </span>
+                    </div>
+                    {favorite.item_location && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <MapPin className="w-4 h-4" />
+                        <span>{favorite.item_location}</span>
+                      </div>
+                    )}
+                    <div className="mt-2 text-xs text-gray-500">
+                      Added on {formatDate(favorite.created_at)}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">No favourites yet. Start adding items to your favourites!</p>
               )}
             </div>
           </div>

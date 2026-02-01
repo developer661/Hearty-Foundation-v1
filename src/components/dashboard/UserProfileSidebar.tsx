@@ -13,6 +13,7 @@ interface UserProfileProps {
     interests: string[];
     points: number;
   };
+  onProfileClick?: () => void;
 }
 
 interface Activity {
@@ -30,7 +31,7 @@ interface AssignedOpportunity {
   start_date: string;
 }
 
-export const UserProfileSidebar = ({ user }: UserProfileProps) => {
+export const UserProfileSidebar = ({ user, onProfileClick }: UserProfileProps) => {
   const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
   const [assignedOpportunities, setAssignedOpportunities] = useState<AssignedOpportunity[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
@@ -85,7 +86,12 @@ export const UserProfileSidebar = ({ user }: UserProfileProps) => {
           </div>
 
           <div className="text-center mb-4">
-            <h3 className="text-xl font-bold text-gray-900">{user.full_name}</h3>
+            <button
+              onClick={onProfileClick}
+              className="text-xl font-bold text-gray-900 hover:text-red-600 transition-colors cursor-pointer"
+            >
+              {user.full_name}
+            </button>
             <p className="text-sm text-gray-600 flex items-center justify-center gap-1 mt-1">
               <MapPin className="w-3 h-3" />
               {user.location}

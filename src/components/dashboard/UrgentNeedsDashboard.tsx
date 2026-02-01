@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertCircle, MapPin, ChevronDown } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { FavoriteButton } from '../FavoriteButton';
 
 interface UrgentNeed {
   id: string;
@@ -157,9 +158,12 @@ export const UrgentNeedsDashboard = ({ userLocation, isReadOnly = false }: Urgen
             >
               <div className="flex items-start justify-between mb-2">
                 <h4 className="font-bold text-gray-900 text-sm line-clamp-2 flex-1">{need.title}</h4>
-                <span className="text-xs font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded ml-2">
-                  URGENT
-                </span>
+                <div className="flex items-center gap-1 ml-2">
+                  <span className="text-xs font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded">
+                    URGENT
+                  </span>
+                  <FavoriteButton itemId={need.id} itemType="urgent_need" />
+                </div>
               </div>
 
               <div className="space-y-1 mb-3">

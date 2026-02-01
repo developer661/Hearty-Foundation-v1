@@ -57,6 +57,7 @@ function App() {
       <AuthProvider>
         <LinkedInDashboard
           onBack={() => handleViewChange('home')}
+          onProfileClick={() => handleViewChange('profile')}
         />
       </AuthProvider>
     );
@@ -121,7 +122,6 @@ function App() {
           onEventsClick={() => handleViewChange('events')}
           onJoinCareFacilityClick={() => handleViewChange('care-facility-registration')}
           onJoinFoundationClick={() => handleViewChange('foundation-registration')}
-          onFavouriteClick={() => handleViewChange('profile')}
         />
 
       <main>
