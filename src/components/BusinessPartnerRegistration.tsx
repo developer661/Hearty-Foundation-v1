@@ -76,7 +76,8 @@ export const BusinessPartnerRegistration = ({ onBack, onSuccess }: BusinessPartn
             user_type: 'business_partner',
             location: formData.address,
             bio: formData.businessProfile,
-            verification_status: 'not_verified',
+            verification_status: 'in_verification',
+            access_level: 'read_only',
             points: 0,
             skills: [],
             interests: []

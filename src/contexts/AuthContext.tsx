@@ -12,7 +12,9 @@ interface UserProfile {
   interests: string[];
   points: number;
   avatar_url?: string;
-  verification_status: 'not_verified' | 'verified_level_1' | 'verified_level_2';
+  user_type: 'volunteer' | 'care_facility_ngo' | 'business_partner';
+  verification_status: 'not_verified' | 'in_verification' | 'verified' | 'rejected';
+  access_level: 'read_only' | 'full_access';
 }
 
 interface AuthContextType {

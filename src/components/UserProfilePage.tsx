@@ -42,24 +42,28 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
   const getVerificationStatusLabel = (status: string) => {
     switch (status) {
       case 'not_verified':
-        return 'Read Only';
-      case 'verified_level_1':
-        return 'Verified: Level 1';
-      case 'verified_level_2':
-        return 'Verified: Level 2';
+        return 'Not Verified';
+      case 'in_verification':
+        return 'In Verification';
+      case 'verified':
+        return 'Verified';
+      case 'rejected':
+        return 'Rejected';
       default:
-        return 'Read Only';
+        return 'Unknown';
     }
   };
 
   const getVerificationStatusColor = (status: string) => {
     switch (status) {
       case 'not_verified':
-        return 'text-orange-600 bg-orange-100';
-      case 'verified_level_1':
+        return 'text-gray-600 bg-gray-100';
+      case 'in_verification':
         return 'text-blue-600 bg-blue-100';
-      case 'verified_level_2':
+      case 'verified':
         return 'text-green-600 bg-green-100';
+      case 'rejected':
+        return 'text-red-600 bg-red-100';
       default:
         return 'text-gray-600 bg-gray-100';
     }
@@ -174,7 +178,7 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
                 {getVerificationStatusLabel(userProfile.verification_status)}
               </span>
             </p>
-            {userProfile.verification_status !== 'verified_level_2' && (
+            {userProfile.verification_status !== 'verified' && (
               <div className="relative">
                 <button
                   onMouseEnter={() => setShowTooltip(true)}

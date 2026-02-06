@@ -57,33 +57,60 @@ export const CareFacilityRegistration = ({ onBack, onSuccess }: CareFacilityRegi
     setIsSubmitting(true);
 
     try {
-      const { data: registration, error: regError } = await supabase
-        .from('care_facility_registrations')
-        .insert({
-          name: formData.name,
-          date_of_establishment: formData.dateOfEstablishment,
-          business_profile: formData.businessProfile,
-          address: formData.address,
-          krs: formData.krs,
-          email: formData.email,
-          password_hash: formData.password,
-          status: 'pending'
-        })
-        .select()
-        .single();
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+      });
 
-      if (regError) throw regError;
+      if (authError) throw authError;
 
-      for (const file of documents) {
-        await supabase
-          .from('care_facility_documents')
+      if (authData.user) {
+        const { error: profileError } = await supabase
+          .from('user_profiles')
           .insert({
-            registration_id: registration.id,
-            document_type: file.name.split('.').pop() || 'document',
-            file_name: file.name,
-            file_url: '',
-            file_size: file.size
+            id: authData.user.id,
+            email: formData.email,
+            full_name: formData.name,
+            user_type: 'care_facility_ngo',
+            location: formData.address,
+            bio: formData.businessProfile,
+            verification_status: 'in_verification',
+            access_level: 'read_only',
+            points: 0,
+            skills: [],
+            interests: []
           });
+
+        if (profileError) throw profileError;
+
+        const { data: registration, error: regError } = await supabase
+          .from('care_facility_registrations')
+          .insert({
+            name: formData.name,
+            date_of_establishment: formData.dateOfEstablishment,
+            business_profile: formData.businessProfile,
+            address: formData.address,
+            krs: formData.krs,
+            email: formData.email,
+            password_hash: formData.password,
+            status: 'pending'
+          })
+          .select()
+          .single();
+
+        if (regError) throw regError;
+
+        for (const file of documents) {
+          await supabase
+            .from('care_facility_documents')
+            .insert({
+              registration_id: registration.id,
+              document_type: file.name.split('.').pop() || 'document',
+              file_name: file.name,
+              file_url: '',
+              file_size: file.size
+            });
+        }
       }
 
       onSuccess();

@@ -56,8 +56,8 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
           <div className="flex items-center gap-3 text-white">
             <LogIn className="w-8 h-8" />
             <div>
-              <h2 className="text-2xl font-bold">Volunteer Login</h2>
-              <p className="text-red-100 text-sm">Sign in to access your dashboard</p>
+              <h2 className="text-2xl font-bold">Login</h2>
+              <p className="text-red-100 text-sm">Sign in to access your account</p>
             </div>
           </div>
         </div>
@@ -113,10 +113,11 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
           </div>
 
           <div className="text-center text-sm text-gray-600 pt-2">
-            <p className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-blue-700">
-              <strong>Demo Account:</strong><br />
-              Email: anna.kowalska@example.com<br />
-              Password: volunteer123
+            <p className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-blue-700 text-left">
+              <strong>Demo Accounts:</strong><br />
+              <span className="text-xs">Volunteer:</span> anna.kowalska@example.com / volunteer123<br />
+              <span className="text-xs">Business Partner (Verified):</span> sponsor@example.com / sponsor123<br />
+              <span className="text-xs">Care Facility/NGO:</span> Register to create account
             </p>
           </div>
         </form>
