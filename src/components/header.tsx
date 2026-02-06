@@ -231,13 +231,31 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
                     >
                       Log In as Volunteer
                     </button>
-                    <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors whitespace-nowrap">
-                      Log In as Care Facility/Carer
+                    <button
+                      onClick={() => {
+                        setLoginOpen(false);
+                        setShowLoginModal(true);
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors whitespace-nowrap"
+                    >
+                      Log In as Care Facility/NGO Organisation
                     </button>
-                    <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors whitespace-nowrap">
-                      Log In as Foundation/NGO
+                    <button
+                      onClick={() => {
+                        setLoginOpen(false);
+                        setShowLoginModal(true);
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors whitespace-nowrap"
+                    >
+                      Log In as Business Partner
                     </button>
-                    <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors whitespace-nowrap">
+                    <button
+                      onClick={() => {
+                        setLoginOpen(false);
+                        setShowLoginModal(true);
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors whitespace-nowrap"
+                    >
                       Log In as Administrator
                     </button>
                   </div>
@@ -431,13 +449,34 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
                     >
                       Log In as Volunteer
                     </button>
-                    <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors whitespace-nowrap">
-                      Log In as Care Facility/Carer
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setLoginOpen(false);
+                        setShowLoginModal(true);
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors whitespace-nowrap"
+                    >
+                      Log In as Care Facility/NGO Organisation
                     </button>
-                    <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors whitespace-nowrap">
-                      Log In as Foundation/NGO
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setLoginOpen(false);
+                        setShowLoginModal(true);
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors whitespace-nowrap"
+                    >
+                      Log In as Business Partner
                     </button>
-                    <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors whitespace-nowrap">
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setLoginOpen(false);
+                        setShowLoginModal(true);
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors whitespace-nowrap"
+                    >
                       Log In as Administrator
                     </button>
                   </div>
