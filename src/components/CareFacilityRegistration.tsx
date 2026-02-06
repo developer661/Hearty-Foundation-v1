@@ -106,8 +106,8 @@ export const CareFacilityRegistration = ({ onBack, onSuccess }: CareFacilityRegi
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Care Facility/Carer Registration</h1>
-              <p className="text-gray-600 mt-1">Join our network of care providers</p>
+              <h1 className="text-3xl font-bold text-gray-900">Care Facility/NGO Organisation Registration</h1>
+              <p className="text-gray-600 mt-1">Join our network of care providers and organisations</p>
             </div>
           </div>
         </div>
@@ -124,7 +124,7 @@ export const CareFacilityRegistration = ({ onBack, onSuccess }: CareFacilityRegi
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Facility/Carer Name *
+                Organisation Name *
               </label>
               <input
                 type="text"

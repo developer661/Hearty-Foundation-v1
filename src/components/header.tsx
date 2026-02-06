@@ -8,11 +8,11 @@ interface HeaderProps {
   onDashboardClick?: () => void;
   onProfileClick?: () => void;
   onEventsClick?: () => void;
-  onJoinCareFacilityClick?: () => void;
-  onJoinFoundationClick?: () => void;
+  onJoinCareFacilityNgoClick?: () => void;
+  onJoinBusinessPartnerClick?: () => void;
 }
 
-export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick, onEventsClick, onJoinCareFacilityClick, onJoinFoundationClick }: HeaderProps) => {
+export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick, onEventsClick, onJoinCareFacilityNgoClick, onJoinBusinessPartnerClick }: HeaderProps) => {
   const { user, userProfile, signOut } = useAuth();
   const [joinOpen, setJoinOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -112,7 +112,7 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
                 <ChevronDown className={`w-4 h-4 transition-transform ${joinOpen ? 'rotate-180' : ''}`} />
               </button>
               {joinOpen && (
-                <div className="absolute top-full mt-1 left-0 bg-white rounded-lg shadow-xl border border-red-200 py-2 min-w-[250px] z-[100]">
+                <div className="absolute top-full mt-1 left-0 bg-white rounded-lg shadow-xl border border-red-200 py-2 min-w-[280px] z-[100]">
                   <button
                     onClick={() => {
                       setJoinOpen(false);
@@ -125,20 +125,20 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
                   <button
                     onClick={() => {
                       setJoinOpen(false);
-                      onJoinCareFacilityClick?.();
+                      onJoinCareFacilityNgoClick?.();
                     }}
                     className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
                   >
-                    Join as Care Facility/Carer
+                    Join as Care Facility/NGO Organisation
                   </button>
                   <button
                     onClick={() => {
                       setJoinOpen(false);
-                      onJoinFoundationClick?.();
+                      onJoinBusinessPartnerClick?.();
                     }}
                     className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
                   >
-                    Join as a Foundation/NGO
+                    Join as Business Partner
                   </button>
                 </div>
               )}
@@ -326,21 +326,21 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
                     onClick={() => {
                       setMobileMenuOpen(false);
                       setJoinOpen(false);
-                      onJoinCareFacilityClick?.();
+                      onJoinCareFacilityNgoClick?.();
                     }}
                     className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
                   >
-                    Join as Care Facility/Carer
+                    Join as Care Facility/NGO Organisation
                   </button>
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
                       setJoinOpen(false);
-                      onJoinFoundationClick?.();
+                      onJoinBusinessPartnerClick?.();
                     }}
                     className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
                   >
-                    Join as a Foundation/NGO
+                    Join as Business Partner
                   </button>
                 </div>
               )}

@@ -10,12 +10,12 @@ import { UserProfilePage } from './components/UserProfilePage';
 import { SuccessMessage } from './components/successmessage';
 import { UpcomingEventsPage } from './components/UpcomingEventsPage';
 import { CareFacilityRegistration } from './components/CareFacilityRegistration';
-import { FoundationRegistration } from './components/FoundationRegistration';
+import { BusinessPartnerRegistration } from './components/BusinessPartnerRegistration';
 import { UrgentNeedsSection } from './components/UrgentNeedsSection';
 import { PartnersGallery } from './components/PartnersGallery';
 import { AuthProvider } from './contexts/AuthContext';
 
-type View = 'home' | 'opportunities' | 'registration' | 'contact' | 'dashboard' | 'profile' | 'success' | 'events' | 'care-facility-registration' | 'foundation-registration';
+type View = 'home' | 'opportunities' | 'registration' | 'contact' | 'dashboard' | 'profile' | 'success' | 'events' | 'care-facility-ngo-registration' | 'business-partner-registration';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('home');
@@ -86,7 +86,7 @@ function App() {
     );
   }
 
-  if (currentView === 'care-facility-registration') {
+  if (currentView === 'care-facility-ngo-registration') {
     return (
       <CareFacilityRegistration
         onBack={() => handleViewChange('home')}
@@ -95,9 +95,9 @@ function App() {
     );
   }
 
-  if (currentView === 'foundation-registration') {
+  if (currentView === 'business-partner-registration') {
     return (
-      <FoundationRegistration
+      <BusinessPartnerRegistration
         onBack={() => handleViewChange('home')}
         onSuccess={() => handleViewChange('success')}
       />
@@ -120,8 +120,8 @@ function App() {
           onDashboardClick={() => handleViewChange('dashboard')}
           onProfileClick={() => handleViewChange('profile')}
           onEventsClick={() => handleViewChange('events')}
-          onJoinCareFacilityClick={() => handleViewChange('care-facility-registration')}
-          onJoinFoundationClick={() => handleViewChange('foundation-registration')}
+          onJoinCareFacilityNgoClick={() => handleViewChange('care-facility-ngo-registration')}
+          onJoinBusinessPartnerClick={() => handleViewChange('business-partner-registration')}
         />
 
       <main>
