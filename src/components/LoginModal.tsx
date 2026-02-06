@@ -116,8 +116,8 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             <p className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-blue-700 text-left">
               <strong>Demo Accounts:</strong><br />
               <span className="text-xs">Volunteer:</span> anna.kowalska@example.com / volunteer123<br />
-              <span className="text-xs">Business Partner (Verified):</span> sponsor@example.com / sponsor123<br />
-              <span className="text-xs">Care Facility/NGO:</span> Register to create account
+              <span className="text-xs">Business Partner:</span> sponsor@example.com / sponsor123<br />
+              <span className="text-xs">Care Facility:</span> sunshine@example.com / sunshine123
             </p>
           </div>
         </form>

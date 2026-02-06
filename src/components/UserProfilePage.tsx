@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle, Heart } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { OrganisationStatistics } from './OrganisationStatistics';
 
 interface UserProfilePageProps {
   onBack: () => void;
@@ -255,12 +256,17 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-red-600" />
-              Skills & Interests
-            </h2>
+        {userProfile.user_type === 'care_facility_ngo' ? (
+          <div className="mt-6">
+            <OrganisationStatistics userId={userProfile.id} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-red-600" />
+                Skills & Interests
+              </h2>
             <div className="space-y-4">
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 mb-2">Skills</h3>
@@ -409,7 +415,8 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
               )}
             </div>
           </div>
-        </div>
+          </div>
+        )}
 
         <div className="bg-white rounded-xl shadow-md p-6 mt-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
