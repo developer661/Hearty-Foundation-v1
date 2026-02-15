@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   Users, Search, UserPlus, UserMinus, CheckCircle, XCircle,
-  Clock, Mail, MapPin, Award, TrendingUp, Filter, Eye, ChevronDown, UserCheck
+  Clock, Mail, MapPin, Award, TrendingUp, Filter, Eye, ChevronDown, UserCheck, Building2, Edit2
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -288,6 +288,62 @@ export const BusinessPartnerProfile = () => {
 
   return (
     <div className="space-y-6">
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+            <Building2 className="w-7 h-7 text-red-600" />
+            About the Firm
+          </h2>
+          <button
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+          >
+            <Edit2 className="w-4 h-4" />
+            Update Profile
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="prose max-w-none">
+            <p className="text-gray-700 leading-relaxed">
+              <strong className="text-gray-900">{userProfile.full_name}</strong> is a leading corporate partner dedicated to making a meaningful impact in our community through strategic volunteer initiatives and social responsibility programs. With over 15 years of experience in corporate social engagement, we have built strong partnerships with local organizations to create sustainable change.
+            </p>
+            <p className="text-gray-700 leading-relaxed mt-3">
+              Our firm specializes in coordinating skilled volunteers across various sectors including education, technology, and community development. We believe in empowering our team members to contribute their expertise and time to causes that matter, fostering a culture of giving back while developing professional skills and meaningful connections.
+            </p>
+            <p className="text-gray-700 leading-relaxed mt-3">
+              <span className="font-semibold text-gray-900">Current Focus:</span> We are actively engaged in youth mentorship programs, digital literacy initiatives for underserved communities, and environmental sustainability projects. Our coordinated volunteer teams have contributed over 5,000 hours of service this year, impacting more than 2,000 beneficiaries across the region.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div className="rounded-lg overflow-hidden shadow-sm">
+              <img
+                src="https://images.pexels.com/photos/380768/pexels-photo-380768.jpeg?auto=compress&cs=tinysrgb&w=800"
+                alt="Modern office headquarters"
+                className="w-full h-48 object-cover"
+              />
+              <p className="text-xs text-gray-600 text-center py-2 bg-gray-50">Our Headquarters</p>
+            </div>
+            <div className="rounded-lg overflow-hidden shadow-sm">
+              <img
+                src="https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=800"
+                alt="Team collaboration"
+                className="w-full h-48 object-cover"
+              />
+              <p className="text-xs text-gray-600 text-center py-2 bg-gray-50">Team Collaboration</p>
+            </div>
+            <div className="rounded-lg overflow-hidden shadow-sm">
+              <img
+                src="https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=800"
+                alt="Community engagement"
+                className="w-full h-48 object-cover"
+              />
+              <p className="text-xs text-gray-600 text-center py-2 bg-gray-50">Community Impact</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white rounded-xl shadow-md p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
