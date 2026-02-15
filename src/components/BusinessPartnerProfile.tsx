@@ -290,10 +290,13 @@ export const BusinessPartnerProfile = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-md p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <Building2 className="w-7 h-7 text-red-600" />
-            About the Firm
-          </h2>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+              <Users className="w-7 h-7 text-red-600" />
+              Volunteer Team Management
+            </h2>
+            <p className="text-gray-600 mt-1">Manage and coordinate your volunteer team</p>
+          </div>
           <button
             className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
           >
@@ -302,57 +305,28 @@ export const BusinessPartnerProfile = () => {
           </button>
         </div>
 
-        <div className="space-y-4">
-          <div className="prose max-w-none">
-            <p className="text-gray-700 leading-relaxed">
-              <strong className="text-gray-900">{userProfile.full_name}</strong> is a leading corporate partner dedicated to making a meaningful impact in our community through strategic volunteer initiatives and social responsibility programs. With over 15 years of experience in corporate social engagement, we have built strong partnerships with local organizations to create sustainable change.
-            </p>
-            <p className="text-gray-700 leading-relaxed mt-3">
-              Our firm specializes in coordinating skilled volunteers across various sectors including education, technology, and community development. We believe in empowering our team members to contribute their expertise and time to causes that matter, fostering a culture of giving back while developing professional skills and meaningful connections.
-            </p>
-            <p className="text-gray-700 leading-relaxed mt-3">
-              <span className="font-semibold text-gray-900">Current Focus:</span> We are actively engaged in youth mentorship programs, digital literacy initiatives for underserved communities, and environmental sustainability projects. Our coordinated volunteer teams have contributed over 5,000 hours of service this year, impacting more than 2,000 beneficiaries across the region.
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg">
+            <div className="text-3xl font-bold text-red-600">{myVolunteers.filter(v => v.status === 'active').length}</div>
+            <div className="text-sm text-gray-700 font-medium">Active Volunteers</div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="rounded-lg overflow-hidden shadow-sm">
-              <img
-                src="https://images.pexels.com/photos/380768/pexels-photo-380768.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="Modern office headquarters"
-                className="w-full h-48 object-cover"
-              />
-              <p className="text-xs text-gray-600 text-center py-2 bg-gray-50">Our Headquarters</p>
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+            <div className="text-3xl font-bold text-blue-600">{myVolunteers.filter(v => v.status === 'invited').length}</div>
+            <div className="text-sm text-gray-700 font-medium">Pending Invitations</div>
+          </div>
+          <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+            <div className="text-3xl font-bold text-green-600">{pendingRequests.length}</div>
+            <div className="text-sm text-gray-700 font-medium">Join Requests</div>
+          </div>
+          <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+            <div className="text-3xl font-bold text-purple-600">
+              {myVolunteers.reduce((sum, rel) => sum + (rel.volunteer?.points || 0), 0)}
             </div>
-            <div className="rounded-lg overflow-hidden shadow-sm">
-              <img
-                src="https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="Team collaboration"
-                className="w-full h-48 object-cover"
-              />
-              <p className="text-xs text-gray-600 text-center py-2 bg-gray-50">Team Collaboration</p>
-            </div>
-            <div className="rounded-lg overflow-hidden shadow-sm">
-              <img
-                src="https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="Community engagement"
-                className="w-full h-48 object-cover"
-              />
-              <p className="text-xs text-gray-600 text-center py-2 bg-gray-50">Community Impact</p>
-            </div>
+            <div className="text-sm text-gray-700 font-medium">Total Team Points</div>
           </div>
         </div>
-      </div>
 
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-              <Users className="w-7 h-7 text-red-600" />
-              Volunteer Team Management
-            </h2>
-            <p className="text-gray-600 mt-1">Manage and coordinate your volunteer team</p>
-          </div>
+        <div className="mb-6">
           <div className="relative">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
@@ -420,27 +394,6 @@ export const BusinessPartnerProfile = () => {
                 </button>
               </div>
             )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg">
-            <div className="text-3xl font-bold text-red-600">{myVolunteers.filter(v => v.status === 'active').length}</div>
-            <div className="text-sm text-gray-700 font-medium">Active Volunteers</div>
-          </div>
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-            <div className="text-3xl font-bold text-blue-600">{myVolunteers.filter(v => v.status === 'invited').length}</div>
-            <div className="text-sm text-gray-700 font-medium">Pending Invitations</div>
-          </div>
-          <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
-            <div className="text-3xl font-bold text-green-600">{pendingRequests.length}</div>
-            <div className="text-sm text-gray-700 font-medium">Join Requests</div>
-          </div>
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
-            <div className="text-3xl font-bold text-purple-600">
-              {myVolunteers.reduce((sum, rel) => sum + (rel.volunteer?.points || 0), 0)}
-            </div>
-            <div className="text-sm text-gray-700 font-medium">Total Team Points</div>
           </div>
         </div>
 
@@ -600,6 +553,56 @@ export const BusinessPartnerProfile = () => {
               {searchTerm ? 'No volunteers match your search' : 'No volunteers in your team yet'}
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+            <Building2 className="w-7 h-7 text-red-600" />
+            About the Firm
+          </h2>
+        </div>
+
+        <div className="space-y-4">
+          <div className="prose max-w-none">
+            <p className="text-gray-700 leading-relaxed">
+              <strong className="text-gray-900">{userProfile.full_name}</strong> is a leading corporate partner dedicated to making a meaningful impact in our community through strategic volunteer initiatives and social responsibility programs. With over 15 years of experience in corporate social engagement, we have built strong partnerships with local organizations to create sustainable change.
+            </p>
+            <p className="text-gray-700 leading-relaxed mt-3">
+              Our firm specializes in coordinating skilled volunteers across various sectors including education, technology, and community development. We believe in empowering our team members to contribute their expertise and time to causes that matter, fostering a culture of giving back while developing professional skills and meaningful connections.
+            </p>
+            <p className="text-gray-700 leading-relaxed mt-3">
+              <span className="font-semibold text-gray-900">Current Focus:</span> We are actively engaged in youth mentorship programs, digital literacy initiatives for underserved communities, and environmental sustainability projects. Our coordinated volunteer teams have contributed over 5,000 hours of service this year, impacting more than 2,000 beneficiaries across the region.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div className="rounded-lg overflow-hidden shadow-sm">
+              <img
+                src="https://images.pexels.com/photos/380768/pexels-photo-380768.jpeg?auto=compress&cs=tinysrgb&w=800"
+                alt="Modern office headquarters"
+                className="w-full h-48 object-cover"
+              />
+              <p className="text-xs text-gray-600 text-center py-2 bg-gray-50">Our Headquarters</p>
+            </div>
+            <div className="rounded-lg overflow-hidden shadow-sm">
+              <img
+                src="https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=800"
+                alt="Team collaboration"
+                className="w-full h-48 object-cover"
+              />
+              <p className="text-xs text-gray-600 text-center py-2 bg-gray-50">Team Collaboration</p>
+            </div>
+            <div className="rounded-lg overflow-hidden shadow-sm">
+              <img
+                src="https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=800"
+                alt="Community engagement"
+                className="w-full h-48 object-cover"
+              />
+              <p className="text-xs text-gray-600 text-center py-2 bg-gray-50">Community Impact</p>
+            </div>
+          </div>
         </div>
       </div>
 
