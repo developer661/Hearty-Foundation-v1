@@ -202,8 +202,12 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
           </div>
           <div className="px-8 pb-8">
             <div className="flex items-start gap-6 -mt-12">
-              <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-xl border-4 border-white flex-shrink-0">
-                <User className="w-16 h-16 text-red-600" />
+              <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-xl border-4 border-white flex-shrink-0 overflow-hidden">
+                {userProfile.avatar_url ? (
+                  <img src={userProfile.avatar_url} alt={userProfile.full_name} className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-16 h-16 text-red-600" />
+                )}
               </div>
 
               <div className="flex-1 pt-16">

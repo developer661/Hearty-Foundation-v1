@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   Users, Search, UserPlus, UserMinus, CheckCircle, XCircle,
-  Clock, Mail, MapPin, Award, TrendingUp, Filter, Eye
+  Clock, Mail, MapPin, Award, TrendingUp, Filter, Eye, ChevronDown, UserCheck
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -46,7 +46,19 @@ export const BusinessPartnerProfile = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'invited'>('all');
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showActivityModal, setShowActivityModal] = useState(false);
+  const [showFindModal, setShowFindModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [inviteSearch, setInviteSearch] = useState('');
+  const [findSearch, setFindSearch] = useState('');
+  const [registerForm, setRegisterForm] = useState({
+    full_name: '',
+    email: '',
+    location: '',
+    skills: '',
+    interests: '',
+    bio: ''
+  });
 
   useEffect(() => {
     if (userProfile) {
@@ -207,6 +219,57 @@ export const BusinessPartnerProfile = () => {
     setShowActivityModal(true);
   };
 
+  const registerVolunteer = async () => {
+    if (!userProfile) return;
+
+    const skillsArray = registerForm.skills.split(',').map(s => s.trim()).filter(s => s);
+    const interestsArray = registerForm.interests.split(',').map(s => s.trim()).filter(s => s);
+
+    const { data: newVolunteer, error: volunteerError } = await supabase
+      .from('user_profiles')
+      .insert({
+        full_name: registerForm.full_name,
+        email: registerForm.email,
+        location: registerForm.location,
+        bio: registerForm.bio,
+        skills: skillsArray,
+        interests: interestsArray,
+        points: 0,
+        user_type: 'volunteer',
+        verification_status: 'verified',
+        access_level: 'full_access'
+      })
+      .select()
+      .single();
+
+    if (volunteerError || !newVolunteer) {
+      alert('Error registering volunteer. Please try again.');
+      return;
+    }
+
+    await supabase
+      .from('volunteer_business_partner_relations')
+      .insert({
+        volunteer_id: newVolunteer.id,
+        business_partner_id: userProfile.id,
+        status: 'active',
+        invitation_type: 'partner_invite',
+        joined_at: new Date().toISOString()
+      });
+
+    setShowRegisterModal(false);
+    setRegisterForm({
+      full_name: '',
+      email: '',
+      location: '',
+      skills: '',
+      interests: '',
+      bio: ''
+    });
+    fetchMyVolunteers();
+    fetchAvailableVolunteers();
+  };
+
   const filteredVolunteers = myVolunteers.filter(rel => {
     const matchesSearch = rel.volunteer.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          rel.volunteer.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -234,13 +297,74 @@ export const BusinessPartnerProfile = () => {
             </h2>
             <p className="text-gray-600 mt-1">Manage and coordinate your volunteer team</p>
           </div>
-          <button
-            onClick={() => setShowInviteModal(true)}
-            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
-          >
-            <UserPlus className="w-5 h-5" />
-            Invite Volunteer
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+            >
+              <Users className="w-5 h-5" />
+              Manage Volunteers
+              <ChevronDown className="w-4 h-4" />
+            </button>
+            {showDropdown && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-10">
+                <button
+                  onClick={() => {
+                    setShowFindModal(true);
+                    setShowDropdown(false);
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
+                >
+                  <Search className="w-4 h-4 text-red-600" />
+                  Find Volunteers
+                </button>
+                <button
+                  onClick={() => {
+                    setShowInviteModal(true);
+                    setShowDropdown(false);
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
+                >
+                  <UserPlus className="w-4 h-4 text-red-600" />
+                  Invite Volunteers
+                </button>
+                <button
+                  onClick={() => {
+                    setShowRegisterModal(true);
+                    setShowDropdown(false);
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
+                >
+                  <UserCheck className="w-4 h-4 text-red-600" />
+                  Register Volunteer
+                </button>
+                <button
+                  onClick={() => {
+                    setShowInviteModal(true);
+                    setShowDropdown(false);
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
+                >
+                  <Mail className="w-4 h-4 text-red-600" />
+                  Propose to Join
+                </button>
+                <button
+                  onClick={() => setShowDropdown(false)}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
+                >
+                  <UserMinus className="w-4 h-4 text-red-600" />
+                  Release Volunteer
+                </button>
+                <button
+                  onClick={() => setShowDropdown(false)}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium rounded-b-lg"
+                >
+                  <TrendingUp className="w-4 h-4 text-red-600" />
+                  See Volunteer Activity
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -529,6 +653,167 @@ export const BusinessPartnerProfile = () => {
                 className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors font-medium"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showFindModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-[450px] h-[450px] overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Search className="w-6 h-6 text-red-600" />
+                Find Volunteers
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">Search for registered volunteers by name</p>
+            </div>
+            <div className="p-6 flex flex-col h-[calc(450px-140px)]">
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Enter volunteer name..."
+                    value={findSearch}
+                    onChange={(e) => setFindSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div className="flex-1 overflow-y-auto space-y-2">
+                {availableVolunteers
+                  .filter(vol => vol.full_name.toLowerCase().includes(findSearch.toLowerCase()))
+                  .slice(0, 10)
+                  .map((volunteer) => (
+                    <div key={volunteer.id} className="p-3 border border-gray-200 rounded-lg hover:border-red-300 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-gray-900">{volunteer.full_name}</p>
+                          <p className="text-sm text-gray-600">{volunteer.email}</p>
+                          <p className="text-xs text-gray-500">{volunteer.location}</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            inviteVolunteer(volunteer.id);
+                            setShowFindModal(false);
+                            setFindSearch('');
+                          }}
+                          className="bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                        >
+                          Invite
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                {findSearch && availableVolunteers.filter(vol => vol.full_name.toLowerCase().includes(findSearch.toLowerCase())).length === 0 && (
+                  <div className="text-center py-8 text-gray-500">No volunteers found</div>
+                )}
+              </div>
+            </div>
+            <div className="p-4 border-t border-gray-200 flex justify-end">
+              <button
+                onClick={() => {
+                  setShowFindModal(false);
+                  setFindSearch('');
+                }}
+                className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRegisterModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-[450px] h-[450px] overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <UserCheck className="w-6 h-6 text-red-600" />
+                Register New Volunteer
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">Register a volunteer on their behalf</p>
+            </div>
+            <div className="p-6 overflow-y-auto h-[calc(450px-140px)]">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    value={registerForm.full_name}
+                    onChange={(e) => setRegisterForm({...registerForm, full_name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                    placeholder="Enter full name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={registerForm.email}
+                    onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                    placeholder="Enter email address"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={registerForm.location}
+                    onChange={(e) => setRegisterForm({...registerForm, location: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                    placeholder="Enter location"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Skills (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={registerForm.skills}
+                    onChange={(e) => setRegisterForm({...registerForm, skills: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                    placeholder="e.g., Teaching, IT Support"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Interests (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={registerForm.interests}
+                    onChange={(e) => setRegisterForm({...registerForm, interests: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                    placeholder="e.g., Education, Environment"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setShowRegisterModal(false);
+                  setRegisterForm({
+                    full_name: '',
+                    email: '',
+                    location: '',
+                    skills: '',
+                    interests: '',
+                    bio: ''
+                  });
+                }}
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={registerVolunteer}
+                disabled={!registerForm.full_name || !registerForm.email || !registerForm.location}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                Register
               </button>
             </div>
           </div>

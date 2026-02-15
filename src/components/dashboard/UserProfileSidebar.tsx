@@ -12,6 +12,7 @@ interface UserProfileProps {
     skills: string[];
     interests: string[];
     points: number;
+    avatar_url?: string;
   };
   onProfileClick?: () => void;
 }
@@ -80,8 +81,12 @@ export const UserProfileSidebar = ({ user, onProfileClick }: UserProfileProps) =
         <div className="h-16 bg-gradient-to-r from-red-500 to-red-600"></div>
         <div className="px-6 pb-6">
           <div className="flex justify-center -mt-8 mb-4">
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-white">
-              <User className="w-12 h-12 text-red-600" />
+            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-white overflow-hidden">
+              {user.avatar_url ? (
+                <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-12 h-12 text-red-600" />
+              )}
             </div>
           </div>
 
