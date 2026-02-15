@@ -297,15 +297,22 @@ export const BusinessPartnerProfile = () => {
             </h2>
             <p className="text-gray-600 mt-1">Manage and coordinate your volunteer team</p>
           </div>
-          <div className="relative">
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setShowDropdown(!showDropdown)}
-              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+              className="flex items-center gap-2 bg-white border border-red-600 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors font-medium"
             >
-              <Users className="w-5 h-5" />
-              Manage Volunteers
-              <ChevronDown className="w-4 h-4" />
+              <Edit2 className="w-4 h-4" />
+              Update Profile
             </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+              >
+                <Users className="w-5 h-5" />
+                Manage Volunteers
+                <ChevronDown className="w-4 h-4" />
+              </button>
             {showDropdown && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-10">
                 <button
@@ -364,6 +371,7 @@ export const BusinessPartnerProfile = () => {
                 </button>
               </div>
             )}
+            </div>
           </div>
         </div>
 
@@ -386,15 +394,6 @@ export const BusinessPartnerProfile = () => {
             </div>
             <div className="text-sm text-gray-700 font-medium">Total Team Points</div>
           </div>
-        </div>
-
-        <div className="mb-6">
-          <button
-            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
-          >
-            <Edit2 className="w-4 h-4" />
-            Update Profile
-          </button>
         </div>
 
         {pendingRequests.length > 0 && (
