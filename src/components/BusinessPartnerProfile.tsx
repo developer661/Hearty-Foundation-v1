@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   Users, Search, UserPlus, UserMinus, CheckCircle, XCircle,
-  Clock, Mail, MapPin, Award, TrendingUp, Filter, Eye, ChevronDown, UserCheck, Building2, Edit2
+  Clock, Mail, MapPin, Award, TrendingUp, Filter, Eye, UserCheck, Building2, Edit2
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -48,7 +48,6 @@ export const BusinessPartnerProfile = () => {
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [showFindModal, setShowFindModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [inviteSearch, setInviteSearch] = useState('');
   const [findSearch, setFindSearch] = useState('');
   const [registerForm, setRegisterForm] = useState({
@@ -297,74 +296,12 @@ export const BusinessPartnerProfile = () => {
             </h2>
             <p className="text-gray-600 mt-1">Manage and coordinate your volunteer team</p>
           </div>
-          <div className="relative">
-            <button
-              onClick={() => setShowDropdown(!showDropdown)}
-              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
-            >
-              <Users className="w-5 h-5" />
-              Manage Volunteers
-              <ChevronDown className="w-4 h-4" />
-            </button>
-            {showDropdown && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-10">
-                <button
-                  onClick={() => {
-                    setShowFindModal(true);
-                    setShowDropdown(false);
-                  }}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
-                >
-                  <Search className="w-4 h-4 text-red-600" />
-                  Find Volunteers
-                </button>
-                <button
-                  onClick={() => {
-                    setShowInviteModal(true);
-                    setShowDropdown(false);
-                  }}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
-                >
-                  <UserPlus className="w-4 h-4 text-red-600" />
-                  Invite Volunteers
-                </button>
-                <button
-                  onClick={() => {
-                    setShowRegisterModal(true);
-                    setShowDropdown(false);
-                  }}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
-                >
-                  <UserCheck className="w-4 h-4 text-red-600" />
-                  Register Volunteer
-                </button>
-                <button
-                  onClick={() => {
-                    setShowInviteModal(true);
-                    setShowDropdown(false);
-                  }}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
-                >
-                  <Mail className="w-4 h-4 text-red-600" />
-                  Propose to Join
-                </button>
-                <button
-                  onClick={() => setShowDropdown(false)}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
-                >
-                  <UserMinus className="w-4 h-4 text-red-600" />
-                  Release Volunteer
-                </button>
-                <button
-                  onClick={() => setShowDropdown(false)}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium rounded-b-lg"
-                >
-                  <TrendingUp className="w-4 h-4 text-red-600" />
-                  See Volunteer Activity
-                </button>
-              </div>
-            )}
-          </div>
+          <button
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+          >
+            <Edit2 className="w-4 h-4" />
+            Update Profile
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -386,15 +323,6 @@ export const BusinessPartnerProfile = () => {
             </div>
             <div className="text-sm text-gray-700 font-medium">Total Team Points</div>
           </div>
-        </div>
-
-        <div className="mb-6">
-          <button
-            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
-          >
-            <Edit2 className="w-4 h-4" />
-            Update Profile
-          </button>
         </div>
 
         {pendingRequests.length > 0 && (
