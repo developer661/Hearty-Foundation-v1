@@ -3,6 +3,8 @@ import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Ta
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { OrganisationStatistics } from './OrganisationStatistics';
+import { BusinessPartnerProfile } from './BusinessPartnerProfile';
+import { VolunteerBusinessPartnerSection } from './VolunteerBusinessPartnerSection';
 
 interface UserProfilePageProps {
   onBack: () => void;
@@ -260,8 +262,15 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
           <div className="mt-6">
             <OrganisationStatistics userId={userProfile.id} />
           </div>
+        ) : userProfile.user_type === 'business_partner' ? (
+          <div className="mt-6">
+            <BusinessPartnerProfile />
+          </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="lg:col-span-2">
+              <VolunteerBusinessPartnerSection volunteerId={userProfile.id} />
+            </div>
             <div className="bg-white rounded-xl shadow-md p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <Briefcase className="w-5 h-5 text-red-600" />
