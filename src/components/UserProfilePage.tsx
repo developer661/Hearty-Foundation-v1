@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle, Heart, Users, ChevronDown, Search, UserPlus, UserCheck, UserMinus, X } from 'lucide-react';
+import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle, Heart, Users, Search, UserPlus, UserCheck, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { OrganisationStatistics } from './OrganisationStatistics';
@@ -41,7 +41,6 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
   const [opportunities, setOpportunities] = useState<AssignedOpportunity[]>([]);
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [showFindModal, setShowFindModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -282,76 +281,7 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
                 {getVerificationStatusLabel(userProfile.verification_status)}
               </span>
             </p>
-            {userProfile.verification_status === 'verified' && userProfile.user_type === 'business_partner' ? (
-              <div className="relative">
-                <button
-                  onClick={() => setShowDropdown(!showDropdown)}
-                  className="flex items-center gap-2 bg-white text-red-600 px-4 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors"
-                >
-                  <Users className="w-5 h-5" />
-                  Manage Volunteers
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-10">
-                    <button
-                      onClick={() => {
-                        setShowFindModal(true);
-                        setShowDropdown(false);
-                      }}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
-                    >
-                      <Search className="w-4 h-4 text-red-600" />
-                      Find Volunteers
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowInviteModal(true);
-                        setShowDropdown(false);
-                      }}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
-                    >
-                      <UserPlus className="w-4 h-4 text-red-600" />
-                      Invite Volunteers
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowRegisterModal(true);
-                        setShowDropdown(false);
-                      }}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
-                    >
-                      <UserCheck className="w-4 h-4 text-red-600" />
-                      Register Volunteer
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowInviteModal(true);
-                        setShowDropdown(false);
-                      }}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
-                    >
-                      <Mail className="w-4 h-4 text-red-600" />
-                      Propose to Join
-                    </button>
-                    <button
-                      onClick={() => setShowDropdown(false)}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium border-b border-gray-100"
-                    >
-                      <UserMinus className="w-4 h-4 text-red-600" />
-                      Release Volunteer
-                    </button>
-                    <button
-                      onClick={() => setShowDropdown(false)}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-gray-700 font-medium rounded-b-lg"
-                    >
-                      <TrendingUp className="w-4 h-4 text-red-600" />
-                      See Volunteer Activity
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : userProfile.verification_status !== 'verified' ? (
+            {userProfile.verification_status !== 'verified' ? (
               <div className="relative">
                 <button
                   onMouseEnter={() => setShowTooltip(true)}
