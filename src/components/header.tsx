@@ -99,50 +99,52 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
               )}
             </div>
 
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setJoinOpen(!joinOpen);
-                  setLoginOpen(false);
-                  setUrgentNeedsOpen(false);
-                }}
-                className="flex items-center gap-1 px-4 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold transition-colors"
-              >
-                Join
-                <ChevronDown className={`w-4 h-4 transition-transform ${joinOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {joinOpen && (
-                <div className="absolute top-full mt-1 left-0 bg-white rounded-lg shadow-xl border border-red-200 py-2 min-w-[280px] z-[100]">
-                  <button
-                    onClick={() => {
-                      setJoinOpen(false);
-                      onJoinVolunteerClick?.();
-                    }}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                  >
-                    Join as a Volunteer
-                  </button>
-                  <button
-                    onClick={() => {
-                      setJoinOpen(false);
-                      onJoinCareFacilityNgoClick?.();
-                    }}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                  >
-                    Join as Care Facility/NGO Organisation
-                  </button>
-                  <button
-                    onClick={() => {
-                      setJoinOpen(false);
-                      onJoinBusinessPartnerClick?.();
-                    }}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                  >
-                    Join as Business Partner
-                  </button>
-                </div>
-              )}
-            </div>
+            {!user && (
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setJoinOpen(!joinOpen);
+                    setLoginOpen(false);
+                    setUrgentNeedsOpen(false);
+                  }}
+                  className="flex items-center gap-1 px-4 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold transition-colors"
+                >
+                  Join
+                  <ChevronDown className={`w-4 h-4 transition-transform ${joinOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {joinOpen && (
+                  <div className="absolute top-full mt-1 left-0 bg-white rounded-lg shadow-xl border border-red-200 py-2 min-w-[280px] z-[100]">
+                    <button
+                      onClick={() => {
+                        setJoinOpen(false);
+                        onJoinVolunteerClick?.();
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    >
+                      Join as a Volunteer
+                    </button>
+                    <button
+                      onClick={() => {
+                        setJoinOpen(false);
+                        onJoinCareFacilityNgoClick?.();
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    >
+                      Join as Care Facility/NGO Organisation
+                    </button>
+                    <button
+                      onClick={() => {
+                        setJoinOpen(false);
+                        onJoinBusinessPartnerClick?.();
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    >
+                      Join as Business Partner
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {user && userProfile ? (
               <div className="relative">
@@ -320,49 +322,51 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
               )}
             </div>
 
-            <div>
-              <button
-                onClick={() => setJoinOpen(!joinOpen)}
-                className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-red-50 rounded-lg font-bold transition-colors"
-              >
-                <span>Join</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${joinOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {joinOpen && (
-                <div className="mt-2 ml-4 space-y-1">
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setJoinOpen(false);
-                      onJoinVolunteerClick?.();
-                    }}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
-                  >
-                    Join as a Volunteer
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setJoinOpen(false);
-                      onJoinCareFacilityNgoClick?.();
-                    }}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
-                  >
-                    Join as Care Facility/NGO Organisation
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setJoinOpen(false);
-                      onJoinBusinessPartnerClick?.();
-                    }}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
-                  >
-                    Join as Business Partner
-                  </button>
-                </div>
-              )}
-            </div>
+            {!user && (
+              <div>
+                <button
+                  onClick={() => setJoinOpen(!joinOpen)}
+                  className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-red-50 rounded-lg font-bold transition-colors"
+                >
+                  <span>Join</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${joinOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {joinOpen && (
+                  <div className="mt-2 ml-4 space-y-1">
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setJoinOpen(false);
+                        onJoinVolunteerClick?.();
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+                    >
+                      Join as a Volunteer
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setJoinOpen(false);
+                        onJoinCareFacilityNgoClick?.();
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+                    >
+                      Join as Care Facility/NGO Organisation
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setJoinOpen(false);
+                        onJoinBusinessPartnerClick?.();
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+                    >
+                      Join as Business Partner
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {user && userProfile ? (
               <div>

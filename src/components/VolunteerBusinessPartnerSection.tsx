@@ -187,11 +187,22 @@ export const VolunteerBusinessPartnerSection = ({ volunteerId }: VolunteerBusine
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
             <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <Building2 className="w-6 h-6 text-red-600" />
-                Find Coordinating Business Partner
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">Search and request to join a business partner's volunteer team</p>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <Building2 className="w-6 h-6 text-red-600" />
+                  Find Coordinating Business Partner
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                    setSearchTerm('');
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600">Search and request to join a business partner's volunteer team</p>
             </div>
             <div className="p-6">
               <div className="mb-4">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle, Heart, Users, ChevronDown, Search, UserPlus, UserCheck, UserMinus } from 'lucide-react';
+import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle, Heart, Users, ChevronDown, Search, UserPlus, UserCheck, UserMinus, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { OrganisationStatistics } from './OrganisationStatistics';
@@ -642,11 +642,22 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-[450px] h-[450px] overflow-hidden">
             <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <Search className="w-6 h-6 text-red-600" />
-                Find Volunteers
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">Search for registered volunteers by name</p>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <Search className="w-6 h-6 text-red-600" />
+                  Find Volunteers
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowFindModal(false);
+                    setFindSearch('');
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600">Search for registered volunteers by name</p>
             </div>
             <div className="p-6 flex flex-col h-[calc(450px-140px)]">
               <div className="mb-4">
@@ -710,10 +721,21 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
             <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <UserPlus className="w-6 h-6 text-red-600" />
-                Invite Volunteer to Your Team
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <UserPlus className="w-6 h-6 text-red-600" />
+                  Invite Volunteer to Your Team
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowInviteModal(false);
+                    setInviteSearch('');
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
             </div>
             <div className="p-6">
               <div className="mb-4">
@@ -775,11 +797,29 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-[450px] h-[450px] overflow-hidden">
             <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <UserCheck className="w-6 h-6 text-red-600" />
-                Register New Volunteer
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">Register a volunteer on their behalf</p>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <UserCheck className="w-6 h-6 text-red-600" />
+                  Register New Volunteer
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowRegisterModal(false);
+                    setRegisterForm({
+                      full_name: '',
+                      email: '',
+                      location: '',
+                      skills: '',
+                      interests: '',
+                      bio: ''
+                    });
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600">Register a volunteer on their behalf</p>
             </div>
             <div className="p-6 overflow-y-auto h-[calc(450px-140px)]">
               <div className="space-y-3">
