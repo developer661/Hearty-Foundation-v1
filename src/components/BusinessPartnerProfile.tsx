@@ -297,36 +297,6 @@ export const BusinessPartnerProfile = () => {
             </h2>
             <p className="text-gray-600 mt-1">Manage and coordinate your volunteer team</p>
           </div>
-          <button
-            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
-          >
-            <Edit2 className="w-4 h-4" />
-            Update Profile
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg">
-            <div className="text-3xl font-bold text-red-600">{myVolunteers.filter(v => v.status === 'active').length}</div>
-            <div className="text-sm text-gray-700 font-medium">Active Volunteers</div>
-          </div>
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-            <div className="text-3xl font-bold text-blue-600">{myVolunteers.filter(v => v.status === 'invited').length}</div>
-            <div className="text-sm text-gray-700 font-medium">Pending Invitations</div>
-          </div>
-          <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
-            <div className="text-3xl font-bold text-green-600">{pendingRequests.length}</div>
-            <div className="text-sm text-gray-700 font-medium">Join Requests</div>
-          </div>
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
-            <div className="text-3xl font-bold text-purple-600">
-              {myVolunteers.reduce((sum, rel) => sum + (rel.volunteer?.points || 0), 0)}
-            </div>
-            <div className="text-sm text-gray-700 font-medium">Total Team Points</div>
-          </div>
-        </div>
-
-        <div className="mb-6">
           <div className="relative">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
@@ -395,6 +365,36 @@ export const BusinessPartnerProfile = () => {
               </div>
             )}
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg">
+            <div className="text-3xl font-bold text-red-600">{myVolunteers.filter(v => v.status === 'active').length}</div>
+            <div className="text-sm text-gray-700 font-medium">Active Volunteers</div>
+          </div>
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+            <div className="text-3xl font-bold text-blue-600">{myVolunteers.filter(v => v.status === 'invited').length}</div>
+            <div className="text-sm text-gray-700 font-medium">Pending Invitations</div>
+          </div>
+          <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+            <div className="text-3xl font-bold text-green-600">{pendingRequests.length}</div>
+            <div className="text-sm text-gray-700 font-medium">Join Requests</div>
+          </div>
+          <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+            <div className="text-3xl font-bold text-purple-600">
+              {myVolunteers.reduce((sum, rel) => sum + (rel.volunteer?.points || 0), 0)}
+            </div>
+            <div className="text-sm text-gray-700 font-medium">Total Team Points</div>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <button
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+          >
+            <Edit2 className="w-4 h-4" />
+            Update Profile
+          </button>
         </div>
 
         {pendingRequests.length > 0 && (
