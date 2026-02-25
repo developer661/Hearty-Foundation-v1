@@ -258,7 +258,7 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
             <div className="flex items-center gap-3">
               <img
                 src="/logo-podstawowe copy.png"
-                alt="Hearthy Foundation Logo"
+                alt="Hearty Foundation Logo"
                 className="h-16 w-auto object-contain"
               />
             </div>

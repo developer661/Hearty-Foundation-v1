@@ -256,7 +256,7 @@ export const VolunteerOpportunities = ({ onBack, onRegister, onContact }: Volunt
             <div className="bg-white rounded-lg p-6 shadow-md">
               <div className="text-4xl mb-4">"</div>
               <p className="text-gray-700 italic mb-4">
-                Volunteering with Hearthy Foundation has been the most rewarding experience of my life. Seeing the children's faces light up when they finally understand a math concept makes every minute worth it.
+                Volunteering with Hearty Foundation has been the most rewarding experience of my life. Seeing the children's faces light up when they finally understand a math concept makes every minute worth it.
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
