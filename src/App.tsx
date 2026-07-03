@@ -27,11 +27,13 @@ function App() {
 
   if (currentView === 'opportunities') {
     return (
-      <VolunteerOpportunities
-        onBack={() => handleViewChange('home')}
-        onRegister={() => handleViewChange('registration')}
-        onContact={() => handleViewChange('contact')}
-      />
+      <AuthProvider>
+        <VolunteerOpportunities
+          onBack={() => handleViewChange('home')}
+          onRegister={() => handleViewChange('registration')}
+          onContact={() => handleViewChange('contact')}
+        />
+      </AuthProvider>
     );
   }
 

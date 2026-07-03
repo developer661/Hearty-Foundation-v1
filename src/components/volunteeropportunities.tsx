@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, MapPin, Building2, Clock, Heart, Users, Award, TrendingUp } from 'lucide-react';
+import { ArrowLeft, MapPin, Building2, Clock, Heart, Users, Award, TrendingUp, Shield, AlertTriangle, Star, Utensils } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Opportunity {
   id: string;
@@ -11,6 +12,16 @@ interface Opportunity {
   location: string;
   urgency: string;
   status: string;
+  kamils_law_required: boolean;
+  frequency: string | null;
+  volunteers_required: number | null;
+  activity_duration: string | null;
+  tags: string[] | null;
+  shared_meals: boolean;
+  friendly_environment: boolean;
+  certificate_available: boolean;
+  volunteer_benefits: string | null;
+  matchScore?: number;
 }
 
 interface VolunteerOpportunitiesProps {
@@ -19,54 +30,110 @@ interface VolunteerOpportunitiesProps {
   onContact: () => void;
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  education_math: 'bg-blue-100 text-blue-700 border-blue-300',
-  education_english: 'bg-green-100 text-green-700 border-green-300',
-  education_polish: 'bg-purple-100 text-purple-700 border-purple-300',
-  sports: 'bg-orange-100 text-orange-700 border-orange-300',
-  arts: 'bg-pink-100 text-pink-700 border-pink-300',
-  health: 'bg-red-100 text-red-700 border-red-300'
-};
+function calculateMatchScore(opp: Opportunity, interests: string[], skills: string[], categoryInterests: string[]): number {
+  const volunteerKeywords = [
+    ...categoryInterests,
+    ...interests,
+    ...skills,
+  ].map(k => k.toLowerCase());
 
-const CATEGORY_LABELS: Record<string, string> = {
-  education_math: 'Math Education',
-  education_english: 'English Education',
-  education_polish: 'Polish Education',
-  sports: 'Sports & Fitness',
-  arts: 'Arts & Creativity',
-  health: 'Health & Wellness'
-};
+  if (volunteerKeywords.length === 0) return 0;
+
+  const oppKeywords = [
+    opp.category,
+    ...(opp.tags ?? []),
+    ...opp.description.split(/\W+/).filter(w => w.length > 3),
+  ].map(k => k.toLowerCase());
+
+  let score = 0;
+  for (const vk of volunteerKeywords) {
+    for (const ok of oppKeywords) {
+      if (ok.includes(vk) || vk.includes(ok)) score++;
+    }
+  }
+  return score;
+}
 
 export const VolunteerOpportunities = ({ onBack, onRegister, onContact }: VolunteerOpportunitiesProps) => {
+  const { userProfile } = useAuth();
   const [urgentOpportunities, setUrgentOpportunities] = useState<Opportunity[]>([]);
   const [ongoingOpportunities, setOngoingOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const isVerified = userProfile?.verification_status === 'verified';
+
   useEffect(() => {
     fetchOpportunities();
-  }, []);
+  }, [userProfile]);
 
   const fetchOpportunities = async () => {
-    const { data: urgent } = await supabase
-      .from('opportunities')
-      .select('*')
-      .eq('status', 'active')
-      .eq('urgency', 'immediate')
-      .order('created_at', { ascending: false })
-      .limit(6);
+    const fields = 'id, title, description, category, institution_name, location, urgency, status, kamils_law_required, frequency, volunteers_required, activity_duration, tags, shared_meals, friendly_environment, certificate_available, volunteer_benefits';
 
-    const { data: ongoing } = await supabase
+    let urgentQ = supabase
       .from('opportunities')
-      .select('*')
+      .select(fields)
+      .eq('status', 'active')
+      .eq('urgency', 'urgent')
+      .order('created_at', { ascending: false })
+      .limit(12);
+
+    let ongoingQ = supabase
+      .from('opportunities')
+      .select(fields)
       .eq('status', 'active')
       .eq('urgency', 'ongoing')
       .order('created_at', { ascending: false })
-      .limit(4);
+      .limit(8);
 
-    if (urgent) setUrgentOpportunities(urgent);
-    if (ongoing) setOngoingOpportunities(ongoing);
+    if (!isVerified) {
+      urgentQ = urgentQ.eq('kamils_law_required', false);
+      ongoingQ = ongoingQ.eq('kamils_law_required', false);
+    }
+
+    const [{ data: urgentData }, { data: ongoingData }] = await Promise.all([urgentQ, ongoingQ]);
+
+    const interests: string[] = userProfile?.interests ?? [];
+    const skills: string[] = userProfile?.skills ?? [];
+    const categoryInterests: string[] = (userProfile as any)?.category_interests ?? [];
+
+    const score = (opp: Opportunity) => calculateMatchScore(opp, interests, skills, categoryInterests);
+
+    const scored = (arr: Opportunity[] | null) =>
+      (arr ?? [])
+        .map(o => ({ ...o, matchScore: score(o) }))
+        .sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0));
+
+    setUrgentOpportunities(scored(urgentData));
+    setOngoingOpportunities(scored(ongoingData));
     setLoading(false);
   };
+
+  const getCategoryColor = (category: string): string => {
+    const map: Record<string, string> = {
+      'Teaching & Tutoring': 'bg-blue-100 text-blue-700 border-blue-300',
+      'Mentoring Programs': 'bg-green-100 text-green-700 border-green-300',
+      'Arts & Music Education': 'bg-pink-100 text-pink-700 border-pink-300',
+      'Sports & Physical Activities': 'bg-orange-100 text-orange-700 border-orange-300',
+      'Technology & Digital Skills': 'bg-cyan-100 text-cyan-700 border-cyan-300',
+      'Language Learning Support': 'bg-teal-100 text-teal-700 border-teal-300',
+      'Healthcare Support': 'bg-red-100 text-red-700 border-red-300',
+      'Environmental & Nature': 'bg-emerald-100 text-emerald-700 border-emerald-300',
+      'Community Outreach': 'bg-yellow-100 text-yellow-700 border-yellow-300',
+      'Food & Nutrition': 'bg-lime-100 text-lime-700 border-lime-300',
+      'Mental Health & Wellbeing': 'bg-violet-100 text-violet-700 border-violet-300',
+      'Senior Care': 'bg-amber-100 text-amber-700 border-amber-300',
+      'Children & Youth Support': 'bg-rose-100 text-rose-700 border-rose-300',
+      'Animal Welfare': 'bg-indigo-100 text-indigo-700 border-indigo-300',
+      'Crisis & Emergency Response': 'bg-red-100 text-red-700 border-red-300',
+    };
+    return map[category] ?? 'bg-gray-100 text-gray-700 border-gray-300';
+  };
+
+  const hasMatchingProfile = userProfile && (
+    ((userProfile as any).category_interests?.length > 0) ||
+    (userProfile.interests?.length > 0) ||
+    (userProfile.skills?.length > 0)
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -110,6 +177,16 @@ export const VolunteerOpportunities = ({ onBack, onRegister, onContact }: Volunt
           </div>
         </div>
 
+        {hasMatchingProfile && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
+            <Star className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-blue-800">
+              Opportunities are ranked by how well they match your interests, skills, and selected volunteering categories.
+              The best matches appear first.
+            </p>
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
           <div className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-red-600">
             <div className="flex items-center gap-3 mb-4">
@@ -148,14 +225,18 @@ export const VolunteerOpportunities = ({ onBack, onRegister, onContact }: Volunt
           </div>
         </div>
 
+        {/* Urgent Opportunities */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
                 <TrendingUp className="w-8 h-8 text-red-600" />
-                Immediate Opportunities
+                Urgent Opportunities
               </h3>
-              <p className="text-gray-600 mt-2">Most urgent needs - your help is needed now!</p>
+              <p className="text-gray-600 mt-2">
+                Most urgent needs — your help is needed now!
+                {hasMatchingProfile && <span className="text-blue-600 ml-1">(sorted by match)</span>}
+              </p>
             </div>
             <div className="px-4 py-2 bg-red-100 text-red-700 rounded-full font-semibold">
               {urgentOpportunities.length} Open Positions
@@ -169,39 +250,14 @@ export const VolunteerOpportunities = ({ onBack, onRegister, onContact }: Volunt
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {urgentOpportunities.map((opp) => (
-                <div
+                <OpportunityCard
                   key={opp.id}
-                  className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1 border-2 border-red-200 overflow-hidden"
-                >
-                  <div className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-white text-sm font-bold uppercase">Urgent</span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${CATEGORY_COLORS[opp.category] || 'bg-gray-100 text-gray-700'}`}>
-                        {CATEGORY_LABELS[opp.category] || opp.category}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h4 className="text-xl font-bold text-gray-900 mb-3">{opp.title}</h4>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{opp.description}</p>
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-start gap-2 text-sm text-gray-700">
-                        <Building2 className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                        <span className="font-medium">{opp.institution_name}</span>
-                      </div>
-                      <div className="flex items-start gap-2 text-sm text-gray-700">
-                        <MapPin className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                        <span>{opp.location}</span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={onRegister}
-                      className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
-                    >
-                      Apply Now
-                    </button>
-                  </div>
-                </div>
+                  opp={opp}
+                  variant="urgent"
+                  categoryColor={getCategoryColor(opp.category)}
+                  onApply={onRegister}
+                  showMatchScore={!!hasMatchingProfile}
+                />
               ))}
             </div>
           )}
@@ -213,38 +269,12 @@ export const VolunteerOpportunities = ({ onBack, onRegister, onContact }: Volunt
             Partner Organizations We Support
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-700">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-              Warsaw Community Schools
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-              Integration Center
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-              Youth Development Foundation
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-              Children's Library Network
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-              Creative Kids Foundation
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-              Health & Wellness Centers
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-              Sports Academy
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-              Community Arts Program
-            </div>
+            {['Warsaw Community Schools', 'Integration Center', 'Youth Development Foundation', "Children's Library Network", 'Creative Kids Foundation', 'Health & Wellness Centers', 'Sports Academy', 'Community Arts Program'].map(org => (
+              <div key={org} className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                {org}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -253,102 +283,51 @@ export const VolunteerOpportunities = ({ onBack, onRegister, onContact }: Volunt
             Voices from Our Community
           </h3>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg p-6 shadow-md">
-              <div className="text-4xl mb-4">"</div>
-              <p className="text-gray-700 italic mb-4">
-                Volunteering with Hearty Foundation has been the most rewarding experience of my life. Seeing the children's faces light up when they finally understand a math concept makes every minute worth it.
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                  <span className="text-red-600 font-bold">AK</span>
-                </div>
-                <div>
-                  <div className="font-bold text-gray-900">Anna Kowalska</div>
-                  <div className="text-sm text-gray-600">Math Tutor, 2 years</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 shadow-md">
-              <div className="text-4xl mb-4">"</div>
-              <p className="text-gray-700 italic mb-4">
-                The foundation gave me hope when I needed it most. My volunteer tutor helped me improve my English and now I can communicate confidently. I'm forever grateful!
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-bold">MH</span>
-                </div>
-                <div>
-                  <div className="font-bold text-gray-900">Maria Hassan</div>
-                  <div className="text-sm text-gray-600">Student Beneficiary</div>
+            {[
+              { text: 'Volunteering with Hearty Foundation has been the most rewarding experience of my life. Seeing the children\'s faces light up when they finally understand a math concept makes every minute worth it.', name: 'Anna Kowalska', role: 'Math Tutor, 2 years', initials: 'AK', color: 'bg-red-100 text-red-600' },
+              { text: 'The foundation gave me hope when I needed it most. My volunteer tutor helped me improve my English and now I can communicate confidently. I\'m forever grateful!', name: 'Maria Hassan', role: 'Student Beneficiary', initials: 'MH', color: 'bg-blue-100 text-blue-600' },
+              { text: 'I joined as a sports coach and found a second family. The community here is incredible, and knowing we\'re making a real difference keeps me coming back every week.', name: 'Piotr Wiśniewski', role: 'Sports Coach, 3 years', initials: 'PW', color: 'bg-green-100 text-green-600' },
+            ].map(t => (
+              <div key={t.name} className="bg-white rounded-lg p-6 shadow-md">
+                <div className="text-4xl mb-4">"</div>
+                <p className="text-gray-700 italic mb-4">{t.text}</p>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 ${t.color} rounded-full flex items-center justify-center`}>
+                    <span className="font-bold">{t.initials}</span>
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-900">{t.name}</div>
+                    <div className="text-sm text-gray-600">{t.role}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 shadow-md">
-              <div className="text-4xl mb-4">"</div>
-              <p className="text-gray-700 italic mb-4">
-                I joined as a sports coach and found a second family. The community here is incredible, and knowing we're making a real difference keeps me coming back every week.
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-green-600 font-bold">PW</span>
-                </div>
-                <div>
-                  <div className="font-bold text-gray-900">Piotr Wiśniewski</div>
-                  <div className="text-sm text-gray-600">Sports Coach, 3 years</div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
+        {/* Ongoing Opportunities */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-3xl font-bold text-gray-900">Ongoing Opportunities</h3>
-              <p className="text-gray-600 mt-2">Long-term commitments for sustained impact</p>
+              <p className="text-gray-600 mt-2">
+                Long-term commitments for sustained impact
+                {hasMatchingProfile && <span className="text-blue-600 ml-1">(sorted by match)</span>}
+              </p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             {ongoingOpportunities.map((opp) => (
-              <div
+              <OpportunityCard
                 key={opp.id}
-                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-200 p-6"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <h4 className="text-xl font-bold text-gray-900 flex-1">{opp.title}</h4>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${CATEGORY_COLORS[opp.category] || 'bg-gray-100 text-gray-700'}`}>
-                    {CATEGORY_LABELS[opp.category] || opp.category}
-                  </span>
-                </div>
-                <p className="text-gray-600 text-sm mb-4">{opp.description}</p>
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <Building2 className="w-4 h-4 text-gray-500" />
-                    <span>{opp.institution_name}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <MapPin className="w-4 h-4 text-gray-500" />
-                    <span>{opp.location}</span>
-                  </div>
-                </div>
-                <button
-                  onClick={onRegister}
-                  className="w-full py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                >
-                  Learn More
-                </button>
-              </div>
+                opp={opp}
+                variant="ongoing"
+                categoryColor={getCategoryColor(opp.category)}
+                onApply={onRegister}
+                showMatchScore={!!hasMatchingProfile}
+              />
             ))}
-          </div>
-
-          <div className="text-center">
-            <button className="text-red-600 hover:text-red-700 font-semibold text-lg flex items-center gap-2 mx-auto">
-              See More Volunteer Opportunities
-              <TrendingUp className="w-5 h-5" />
-            </button>
           </div>
         </div>
 
@@ -374,6 +353,138 @@ export const VolunteerOpportunities = ({ onBack, onRegister, onContact }: Volunt
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+interface OpportunityCardProps {
+  opp: Opportunity;
+  variant: 'urgent' | 'ongoing';
+  categoryColor: string;
+  onApply: () => void;
+  showMatchScore: boolean;
+}
+
+const OpportunityCard = ({ opp, variant, categoryColor, onApply, showMatchScore }: OpportunityCardProps) => {
+  const isUrgent = variant === 'urgent';
+
+  return (
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1 overflow-hidden ${
+      isUrgent ? 'border-2 border-red-200' : 'border border-gray-200'
+    }`}>
+      {isUrgent && (
+        <div className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-2">
+          <div className="flex items-center justify-between">
+            <span className="text-white text-sm font-bold uppercase">Urgent</span>
+            <div className="flex items-center gap-2">
+              {opp.kamils_law_required && (
+                <span className="flex items-center gap-1 text-xs font-semibold text-amber-900 bg-amber-200 px-2 py-0.5 rounded-full">
+                  <Shield className="w-3 h-3" />
+                  Kamil's Law
+                </span>
+              )}
+              <span className={`px-3 py-1 rounded-full text-xs font-medium border ${categoryColor}`}>
+                {opp.category}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="p-6">
+        {!isUrgent && (
+          <div className="flex items-start justify-between mb-4">
+            <h4 className="text-xl font-bold text-gray-900 flex-1">{opp.title}</h4>
+            <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+              {opp.kamils_law_required && (
+                <span className="flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
+                  <Shield className="w-3 h-3" />
+                  Kamil's Law
+                </span>
+              )}
+              <span className={`px-3 py-1 rounded-full text-xs font-medium border ${categoryColor}`}>
+                {opp.category}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {isUrgent && (
+          <h4 className="text-xl font-bold text-gray-900 mb-3">{opp.title}</h4>
+        )}
+
+        {showMatchScore && (opp.matchScore ?? 0) > 0 && (
+          <div className="flex items-center gap-1.5 mb-3 text-xs text-blue-700 bg-blue-50 px-2 py-1 rounded-full w-fit">
+            <Star className="w-3 h-3 fill-blue-500 text-blue-500" />
+            <span className="font-semibold">Matches your profile</span>
+          </div>
+        )}
+
+        <p className="text-gray-600 text-sm mb-4 line-clamp-3">{opp.description}</p>
+
+        <div className="space-y-2 mb-4">
+          <div className="flex items-start gap-2 text-sm text-gray-700">
+            <Building2 className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+            <span className="font-medium">{opp.institution_name}</span>
+          </div>
+          <div className="flex items-start gap-2 text-sm text-gray-700">
+            <MapPin className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+            <span>{opp.location}</span>
+          </div>
+          {opp.frequency && (
+            <div className="flex items-start gap-2 text-sm text-gray-700">
+              <Clock className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+              <span>{opp.frequency}{opp.activity_duration ? ` · ${opp.activity_duration}` : ''}</span>
+            </div>
+          )}
+          {opp.volunteers_required && (
+            <div className="flex items-start gap-2 text-sm text-gray-700">
+              <Users className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+              <span>{opp.volunteers_required} volunteer{opp.volunteers_required !== 1 ? 's' : ''} needed</span>
+            </div>
+          )}
+        </div>
+
+        {(opp.shared_meals || opp.friendly_environment || opp.certificate_available) && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {opp.shared_meals && (
+              <span className="flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full border border-green-200">
+                <Utensils className="w-3 h-3" />Meals
+              </span>
+            )}
+            {opp.friendly_environment && (
+              <span className="flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+                <Heart className="w-3 h-3" />Friendly
+              </span>
+            )}
+            {opp.certificate_available && (
+              <span className="flex items-center gap-1 text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">
+                <Award className="w-3 h-3" />Certificate
+              </span>
+            )}
+          </div>
+        )}
+
+        {opp.kamils_law_required && (
+          <div className="flex items-start gap-2 mb-4 p-2 bg-amber-50 border border-amber-200 rounded-lg">
+            <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-800">
+              According to Kamil's Law proper documentation is required to use this opportunity
+            </p>
+          </div>
+        )}
+
+        <button
+          onClick={onApply}
+          className={`w-full py-3 rounded-lg font-semibold transition-colors ${
+            isUrgent
+              ? 'bg-red-600 text-white hover:bg-red-700'
+              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+          }`}
+        >
+          {isUrgent ? 'Apply Now' : 'Learn More'}
+        </button>
       </div>
     </div>
   );

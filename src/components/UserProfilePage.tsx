@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle, Heart, Users, Search, UserPlus, UserCheck, X } from 'lucide-react';
+import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle, Heart, Users, Search, UserPlus, UserCheck, X, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { OrganisationStatistics } from './OrganisationStatistics';
 import { BusinessPartnerProfile } from './BusinessPartnerProfile';
 import { VolunteerBusinessPartnerSection } from './VolunteerBusinessPartnerSection';
+import { CreateOpportunityModal } from './CreateOpportunityModal';
 
 interface UserProfilePageProps {
   onBack: () => void;
@@ -41,6 +42,7 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
   const [opportunities, setOpportunities] = useState<AssignedOpportunity[]>([]);
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showCreateOpportunityModal, setShowCreateOpportunityModal] = useState(false);
   const [showFindModal, setShowFindModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -281,7 +283,17 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
                 {getVerificationStatusLabel(userProfile.verification_status)}
               </span>
             </p>
-            {userProfile.verification_status !== 'verified' ? (
+            <div className="flex items-center gap-3">
+              {(userProfile.user_type === 'care_facility_ngo' || userProfile.user_type === 'business_partner') && (
+                <button
+                  onClick={() => setShowCreateOpportunityModal(true)}
+                  className="flex items-center gap-2 bg-white text-red-600 px-4 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors shadow-md"
+                >
+                  <Plus className="w-5 h-5" />
+                  Create Opportunity / Urgent Need
+                </button>
+              )}
+              {userProfile.verification_status !== 'verified' ? (
               <div className="relative">
                 <button
                   onMouseEnter={() => setShowTooltip(true)}
@@ -299,6 +311,7 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
                 )}
               </div>
             ) : null}
+            </div>
           </div>
           <div className="px-8 pb-8">
             <div className="flex items-start gap-6 -mt-12">
@@ -567,6 +580,12 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
           </div>
         </div>
       </div>
+
+      <CreateOpportunityModal
+        isOpen={showCreateOpportunityModal}
+        onClose={() => setShowCreateOpportunityModal(false)}
+        onSuccess={() => setShowCreateOpportunityModal(false)}
+      />
 
       {showFindModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

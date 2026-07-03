@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { MapPin, AlertCircle, ArrowRight } from 'lucide-react';
+import { MapPin, AlertCircle, ArrowRight, Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FavoriteButton } from './FavoriteButton';
+import { useAuth } from '../contexts/AuthContext';
 
 interface UrgentNeed {
   id: string;
@@ -11,6 +12,7 @@ interface UrgentNeed {
   institution_name: string;
   urgency: string;
   category: string;
+  kamils_law_required: boolean;
 }
 
 interface UrgentNeedsSectionProps {
@@ -18,32 +20,41 @@ interface UrgentNeedsSectionProps {
 }
 
 export const UrgentNeedsSection = ({ onViewAllClick }: UrgentNeedsSectionProps) => {
+  const { userProfile } = useAuth();
   const [urgentNeeds, setUrgentNeeds] = useState<UrgentNeed[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  const isVerified = userProfile?.verification_status === 'verified';
+
   useEffect(() => {
     fetchUrgentNeeds();
-  }, []);
+  }, [isVerified]);
 
   const fetchUrgentNeeds = async () => {
     try {
-      const { count } = await supabase
+      let countQuery = supabase
         .from('opportunities')
         .select('*', { count: 'exact', head: true })
         .eq('urgency', 'urgent')
         .eq('status', 'active');
 
-      setTotalCount(count || 0);
-
-      const { data, error } = await supabase
+      let dataQuery = supabase
         .from('opportunities')
-        .select('*')
+        .select('id, title, description, location, institution_name, urgency, category, kamils_law_required')
         .eq('urgency', 'urgent')
         .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(3);
+        .order('created_at', { ascending: false });
 
+      if (!isVerified) {
+        countQuery = countQuery.eq('kamils_law_required', false);
+        dataQuery = dataQuery.eq('kamils_law_required', false);
+      }
+
+      const { count } = await countQuery;
+      setTotalCount(count || 0);
+
+      const { data, error } = await dataQuery.limit(3);
       if (error) throw error;
       setUrgentNeeds(data || []);
     } catch (error) {
@@ -84,13 +95,19 @@ export const UrgentNeedsSection = ({ onViewAllClick }: UrgentNeedsSectionProps) 
             >
               <div className="p-4 h-full flex flex-col">
                 <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <div className="bg-red-100 rounded-full p-1.5">
                       <AlertCircle className="w-4 h-4 text-red-600" />
                     </div>
                     <span className="text-xs font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
                       URGENT
                     </span>
+                    {need.kamils_law_required && (
+                      <span className="flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                        <Shield className="w-3 h-3" />
+                        Kamil's Law
+                      </span>
+                    )}
                   </div>
                   <FavoriteButton itemId={need.id} itemType="urgent_need" />
                 </div>

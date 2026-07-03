@@ -1,6 +1,7 @@
 import { useState, ChangeEvent } from 'react';
-import { ArrowLeft, Upload, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Upload, X, CheckCircle, AlertCircle, ChevronDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { VOLUNTEER_CATEGORIES } from '../lib/categories';
 
 interface VolunteerRegistrationProps {
   onBack: () => void;
@@ -14,6 +15,7 @@ interface FormData {
   phone: string;
   date_of_birth: string;
   profession: string;
+  category_interests: string[];
   experience: string;
   motivation: string;
   password: string;
@@ -35,6 +37,7 @@ export const VolunteerRegistration = ({ onBack, onSuccess }: VolunteerRegistrati
     phone: '',
     date_of_birth: '',
     profession: '',
+    category_interests: [],
     experience: '',
     motivation: '',
     password: '',
@@ -45,6 +48,16 @@ export const VolunteerRegistration = ({ onBack, onSuccess }: VolunteerRegistrati
   const [errors, setErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [currentStep] = useState(1);
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+
+  const toggleCategoryInterest = (cat: string) => {
+    setFormData(prev => ({
+      ...prev,
+      category_interests: prev.category_interests.includes(cat)
+        ? prev.category_interests.filter(c => c !== cat)
+        : [...prev.category_interests, cat],
+    }));
+  };
 
   const validateDocument = (file: File): { valid: boolean; error?: string } => {
     const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
@@ -130,10 +143,11 @@ export const VolunteerRegistration = ({ onBack, onSuccess }: VolunteerRegistrati
           email: formData.email,
           location: formData.phone ? 'Poland' : '',
           bio: formData.motivation || null,
+          category_interests: formData.category_interests,
           verification_status: 'not_verified'
         }]);
 
-        if (formData.phone || formData.date_of_birth || formData.profession || formData.experience || formData.motivation) {
+        if (formData.phone || formData.date_of_birth || formData.profession || formData.experience || formData.motivation || formData.category_interests.length > 0) {
           await supabase.from('volunteer_registrations').insert([{
             full_name: `${formData.first_name} ${formData.last_name}`,
             email: formData.email,
@@ -142,6 +156,7 @@ export const VolunteerRegistration = ({ onBack, onSuccess }: VolunteerRegistrati
             profession: formData.profession || '',
             experience: formData.experience || '',
             motivation: formData.motivation || '',
+            category_interests: formData.category_interests,
             status: 'pending'
           }]);
         }
@@ -292,6 +307,63 @@ export const VolunteerRegistration = ({ onBack, onSuccess }: VolunteerRegistrati
                       placeholder="Software Engineer"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Categories Interests for Volunteering
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Select categories you'd like to volunteer in. This helps us match you with the best opportunities.
+                  </p>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+                      className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white text-left text-sm"
+                    >
+                      <span className={formData.category_interests.length > 0 ? 'text-gray-900' : 'text-gray-400'}>
+                        {formData.category_interests.length > 0
+                          ? `${formData.category_interests.length} category(ies) selected`
+                          : 'Select categories...'}
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${categoryDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {categoryDropdownOpen && (
+                      <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                        {VOLUNTEER_CATEGORIES.map(cat => (
+                          <label key={cat} className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={formData.category_interests.includes(cat)}
+                              onChange={() => toggleCategoryInterest(cat)}
+                              className="w-4 h-4 text-red-600 rounded"
+                            />
+                            <span className="text-sm text-gray-700">{cat}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {formData.category_interests.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {formData.category_interests.map(cat => (
+                        <span
+                          key={cat}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium"
+                        >
+                          {cat}
+                          <button
+                            type="button"
+                            onClick={() => toggleCategoryInterest(cat)}
+                            className="hover:text-red-900"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div>
