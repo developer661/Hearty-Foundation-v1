@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle, Heart, Users, Search, UserPlus, UserCheck, X, Plus } from 'lucide-react';
+import { ArrowLeft, User, MapPin, Mail, Calendar, Award, FileText, Briefcase, Target, TrendingUp, AlertCircle, Heart, Users, Search, UserPlus, UserCheck, X, Plus, Shield, BookOpen } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { OrganisationStatistics } from './OrganisationStatistics';
 import { BusinessPartnerProfile } from './BusinessPartnerProfile';
 import { VolunteerBusinessPartnerSection } from './VolunteerBusinessPartnerSection';
 import { CreateOpportunityModal } from './CreateOpportunityModal';
+import { RoleManagementPanel } from './RoleManagementPanel';
+import { canCreateOpportunity, isOrgAdmin, getOrgRoleLabel, getOrgRoleBadgeColor } from '../lib/permissions';
 
 interface UserProfilePageProps {
   onBack: () => void;
@@ -41,6 +43,7 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [opportunities, setOpportunities] = useState<AssignedOpportunity[]>([]);
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  const [onboardingRead, setOnboardingRead] = useState<{ viewed_at: string; dismissed_at: string | null } | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [showCreateOpportunityModal, setShowCreateOpportunityModal] = useState(false);
   const [showFindModal, setShowFindModal] = useState(false);
@@ -94,8 +97,21 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
       if (userProfile.user_type === 'business_partner') {
         fetchAvailableVolunteers();
       }
+      if (userProfile.user_type === 'volunteer') {
+        fetchOnboardingRead();
+      }
     }
   }, [userProfile]);
+
+  const fetchOnboardingRead = async () => {
+    if (!userProfile) return;
+    const { data } = await supabase
+      .from('volunteer_onboarding_reads')
+      .select('viewed_at, dismissed_at')
+      .eq('volunteer_id', userProfile.id)
+      .maybeSingle();
+    if (data) setOnboardingRead(data);
+  };
 
   const fetchUserData = async () => {
     if (!userProfile) return;
@@ -284,7 +300,7 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
               </span>
             </p>
             <div className="flex items-center gap-3">
-              {(userProfile.user_type === 'care_facility_ngo' || userProfile.user_type === 'business_partner') && (
+              {(userProfile.user_type === 'care_facility_ngo' || userProfile.user_type === 'business_partner') && canCreateOpportunity(userProfile) && (
                 <button
                   onClick={() => setShowCreateOpportunityModal(true)}
                   className="flex items-center gap-2 bg-white text-red-600 px-4 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors shadow-md"
@@ -333,10 +349,16 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
                       <Mail className="w-4 h-4" />
                       {userProfile.email}
                     </p>
-                    <p className="text-gray-600 flex items-center gap-2">
+                    <p className="text-gray-600 flex items-center gap-2 mb-2">
                       <MapPin className="w-4 h-4" />
                       {userProfile.location}
                     </p>
+                    {userProfile.org_role && (
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${getOrgRoleBadgeColor(userProfile.org_role)}`}>
+                        <Shield className="w-3 h-3" />
+                        {getOrgRoleLabel(userProfile.org_role)}
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex gap-8">
@@ -376,12 +398,18 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
         </div>
 
         {userProfile.user_type === 'care_facility_ngo' ? (
-          <div className="mt-6">
+          <div className="mt-6 space-y-6">
             <OrganisationStatistics userId={userProfile.id} />
+            {isOrgAdmin(userProfile) && (
+              <RoleManagementPanel orgAdminId={userProfile.id} orgAdminName={userProfile.full_name} />
+            )}
           </div>
         ) : userProfile.user_type === 'business_partner' ? (
-          <div className="mt-6">
+          <div className="mt-6 space-y-6">
             <BusinessPartnerProfile />
+            {isOrgAdmin(userProfile) && (
+              <RoleManagementPanel orgAdminId={userProfile.id} orgAdminName={userProfile.full_name} />
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -541,6 +569,30 @@ export const UserProfilePage = ({ onBack }: UserProfilePageProps) => {
               )}
             </div>
           </div>
+
+          {onboardingRead && (
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-red-600" />
+                Onboarding Package
+              </h2>
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-green-900">Welcome Package Received</p>
+                    <p className="text-xs text-green-700 mt-0.5">
+                      Viewed on {new Date(onboardingRead.viewed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      {onboardingRead.dismissed_at && ` · Completed on ${new Date(onboardingRead.dismissed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-3">Contact your organization if you need a refresher on onboarding materials or updated instructions.</p>
+            </div>
+          )}
           </div>
         )}
 

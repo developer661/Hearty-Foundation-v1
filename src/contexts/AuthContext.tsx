@@ -15,6 +15,9 @@ interface UserProfile {
   user_type: 'volunteer' | 'care_facility_ngo' | 'business_partner';
   verification_status: 'not_verified' | 'in_verification' | 'verified' | 'rejected';
   access_level: 'read_only' | 'full_access';
+  org_role: 'org_admin' | 'opportunity_manager' | null;
+  organization_id: string | null;
+  category_interests: string[];
 }
 
 interface AuthContextType {
