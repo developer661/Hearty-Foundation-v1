@@ -14,6 +14,7 @@ import { BusinessPartnerRegistration } from './components/BusinessPartnerRegistr
 import { UrgentNeedsSection } from './components/UrgentNeedsSection';
 import { PartnersGallery } from './components/PartnersGallery';
 import { OnboardingModal } from './components/OnboardingModal';
+import { AboutFoundationPanel } from './components/AboutFoundationPanel';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 
@@ -58,6 +59,7 @@ const OnboardingGate = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('home');
+  const [showAbout, setShowAbout] = useState(false);
 
   const handleViewChange = (view: View) => {
     setCurrentView(view);
@@ -172,7 +174,10 @@ function App() {
             onEventsClick={() => handleViewChange('events')}
             onJoinCareFacilityNgoClick={() => handleViewChange('care-facility-ngo-registration')}
             onJoinBusinessPartnerClick={() => handleViewChange('business-partner-registration')}
+            onAboutClick={() => setShowAbout(true)}
           />
+
+          {showAbout && <AboutFoundationPanel onClose={() => setShowAbout(false)} />}
 
         <main>
           <HeroSection onJoinClick={() => handleViewChange('opportunities')} />

@@ -10,9 +10,10 @@ interface HeaderProps {
   onEventsClick?: () => void;
   onJoinCareFacilityNgoClick?: () => void;
   onJoinBusinessPartnerClick?: () => void;
+  onAboutClick?: () => void;
 }
 
-export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick, onEventsClick, onJoinCareFacilityNgoClick, onJoinBusinessPartnerClick }: HeaderProps) => {
+export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick, onEventsClick, onJoinCareFacilityNgoClick, onJoinBusinessPartnerClick, onAboutClick }: HeaderProps) => {
   const { user, userProfile, signOut } = useAuth();
   const [joinOpen, setJoinOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -47,14 +48,12 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
           </button>
 
           <nav className="hidden md:flex items-center gap-2">
-            <a
-              href="https://www.serdeczna.org"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={onAboutClick}
               className="px-4 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold transition-colors"
             >
               About us
-            </a>
+            </button>
 
             <button
               onClick={onDashboardClick}
@@ -271,14 +270,15 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-red-200 shadow-lg">
           <nav className="px-4 py-4 space-y-2">
-            <a
-              href="https://www.serdeczna.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-red-50 rounded-lg font-bold transition-colors"
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                onAboutClick?.();
+              }}
+              className="w-full text-left px-4 py-3 text-gray-700 hover:bg-red-50 rounded-lg font-bold transition-colors"
             >
               About us
-            </a>
+            </button>
 
             <button
               onClick={() => {
