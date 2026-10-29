@@ -2,6 +2,7 @@ import { ChevronDown, Menu, X, User, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginModal } from './LoginModal';
+import { DashboardAccessModal } from './DashboardAccessModal';
 
 interface HeaderProps {
   onJoinVolunteerClick?: () => void;
@@ -21,11 +22,21 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
   const [urgentNeedsOpen, setUrgentNeedsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [dashboardGateOpen, setDashboardGateOpen] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
     setUserMenuOpen(false);
     setMobileMenuOpen(false);
+  };
+
+  const handleDashboardClick = () => {
+    setMobileMenuOpen(false);
+    if (user) {
+      onDashboardClick?.();
+    } else {
+      setDashboardGateOpen(true);
+    }
   };
 
   return (
@@ -36,7 +47,7 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
             <img
               src="/logo-podstawowe copy.png"
               alt="Hearty Foundation Logo"
-              className="h-16 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
           </div>
 
@@ -56,7 +67,7 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
             </button>
 
             <button
-              onClick={onDashboardClick}
+              onClick={handleDashboardClick}
               className="px-4 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold transition-colors"
             >
               Dashboard
@@ -282,8 +293,7 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
 
             <button
               onClick={() => {
-                setMobileMenuOpen(false);
-                onDashboardClick?.();
+                handleDashboardClick();
               }}
               className="w-full text-left px-4 py-3 text-gray-700 hover:bg-red-50 rounded-lg font-bold transition-colors"
             >
@@ -492,6 +502,18 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
       )}
 
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <DashboardAccessModal
+        isOpen={dashboardGateOpen}
+        onClose={() => setDashboardGateOpen(false)}
+        onRegister={() => {
+          setDashboardGateOpen(false);
+          onJoinVolunteerClick?.();
+        }}
+        onSignIn={() => {
+          setDashboardGateOpen(false);
+          setShowLoginModal(true);
+        }}
+      />
     </header>
   );
 };

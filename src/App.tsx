@@ -15,6 +15,7 @@ import { UrgentNeedsSection } from './components/UrgentNeedsSection';
 import { PartnersGallery } from './components/PartnersGallery';
 import { OnboardingModal } from './components/OnboardingModal';
 import { AboutFoundationPanel } from './components/AboutFoundationPanel';
+import { SuccessStoriesPanel } from './components/SuccessStoriesPanel';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 
@@ -60,6 +61,7 @@ const OnboardingGate = ({ children }: { children: React.ReactNode }) => {
 function App() {
   const [currentView, setCurrentView] = useState<View>('home');
   const [showAbout, setShowAbout] = useState(false);
+  const [showStories, setShowStories] = useState(false);
 
   const handleViewChange = (view: View) => {
     setCurrentView(view);
@@ -178,9 +180,13 @@ function App() {
           />
 
           {showAbout && <AboutFoundationPanel onClose={() => setShowAbout(false)} />}
+          {showStories && <SuccessStoriesPanel onClose={() => setShowStories(false)} />}
 
         <main>
-          <HeroSection onJoinClick={() => handleViewChange('opportunities')} />
+          <HeroSection
+            onJoinClick={() => handleViewChange('opportunities')}
+            onStoriesClick={() => setShowStories(true)}
+          />
           <UrgentNeedsSection onViewAllClick={() => handleViewChange('opportunities')} />
           <PartnersGallery />
           <FeatureSection />

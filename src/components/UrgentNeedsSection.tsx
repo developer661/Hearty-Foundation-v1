@@ -91,7 +91,7 @@ export const UrgentNeedsSection = ({ onViewAllClick }: UrgentNeedsSectionProps) 
           {urgentNeeds.map((need) => (
             <div
               key={need.id}
-              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-red-200 hover:border-red-400 group cursor-pointer aspect-square"
+              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 hover:border-gray-400 group aspect-square"
             >
               <div className="p-4 h-full flex flex-col">
                 <div className="flex items-start justify-between mb-2">
@@ -118,10 +118,6 @@ export const UrgentNeedsSection = ({ onViewAllClick }: UrgentNeedsSectionProps) 
 
                 <div className="flex-grow"></div>
 
-                <button className="w-full mb-3 py-2 px-3 bg-red-600 text-white text-xs font-semibold rounded-lg hover:bg-red-700 transition-colors">
-                  More information
-                </button>
-
                 <div className="space-y-1 flex-shrink-0">
                   <div className="flex items-center gap-1 text-xs text-gray-700">
                     <MapPin className="w-3 h-3 text-red-500 flex-shrink-0" />
@@ -137,6 +133,13 @@ export const UrgentNeedsSection = ({ onViewAllClick }: UrgentNeedsSectionProps) 
                     {need.category}
                   </span>
                 </div>
+
+                <button
+                  onClick={onViewAllClick}
+                  className="w-full mt-4 py-2.5 px-3 bg-gray-700 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  Apply Now
+                </button>
               </div>
             </div>
           ))}
@@ -144,7 +147,7 @@ export const UrgentNeedsSection = ({ onViewAllClick }: UrgentNeedsSectionProps) 
           {remainingCount > 0 && (
             <div
               onClick={onViewAllClick}
-              className="bg-gradient-to-br from-red-600 to-red-700 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group aspect-square"
+              className="bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group aspect-square"
             >
               <div className="p-4 h-full flex flex-col items-center justify-center text-white">
                 <div className="mb-2">
@@ -157,7 +160,7 @@ export const UrgentNeedsSection = ({ onViewAllClick }: UrgentNeedsSectionProps) 
 
                 <div className="text-4xl font-bold mb-2">+{remainingCount}</div>
 
-                <p className="text-xs text-red-100 text-center px-2">
+                <p className="text-xs text-gray-300 text-center px-2">
                   View all urgent opportunities
                 </p>
 
