@@ -256,6 +256,7 @@ export const VolunteerOpportunities = ({ onBack, onRegister, onContact }: Volunt
                   variant="urgent"
                   categoryColor={getCategoryColor(opp.category)}
                   onApply={onRegister}
+                  onMoreInfo={onContact}
                   showMatchScore={!!hasMatchingProfile}
                 />
               ))}
@@ -363,10 +364,11 @@ interface OpportunityCardProps {
   variant: 'urgent' | 'ongoing';
   categoryColor: string;
   onApply: () => void;
+  onMoreInfo?: () => void;
   showMatchScore: boolean;
 }
 
-const OpportunityCard = ({ opp, variant, categoryColor, onApply, showMatchScore }: OpportunityCardProps) => {
+const OpportunityCard = ({ opp, variant, categoryColor, onApply, onMoreInfo, showMatchScore }: OpportunityCardProps) => {
   const isUrgent = variant === 'urgent';
 
   return (
@@ -421,7 +423,17 @@ const OpportunityCard = ({ opp, variant, categoryColor, onApply, showMatchScore 
           </div>
         )}
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3 min-h-[3.75rem]">{opp.description}</p>
+        <div className="relative mb-4 min-h-[3.75rem]">
+          <p className={`text-gray-600 text-sm line-clamp-3 min-h-[3.75rem] ${isUrgent ? 'pr-20' : ''}`}>{opp.description}</p>
+          {isUrgent && onMoreInfo && (
+            <button
+              onClick={onMoreInfo}
+              className="absolute bottom-0 right-0 text-sm font-semibold text-gray-900 underline underline-offset-2 hover:text-red-600 transition-colors"
+            >
+              More info
+            </button>
+          )}
+        </div>
 
         <div className="space-y-2 mb-4">
           <div className="flex items-start gap-2 text-sm text-gray-700">
