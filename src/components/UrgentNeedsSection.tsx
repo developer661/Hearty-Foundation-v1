@@ -91,7 +91,7 @@ export const UrgentNeedsSection = ({ onViewAllClick }: UrgentNeedsSectionProps) 
           {urgentNeeds.map((need) => (
             <div
               key={need.id}
-              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 hover:border-gray-400 group aspect-square"
+              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 hover:border-gray-400 group min-h-[18rem]"
             >
               <div className="p-4 h-full flex flex-col">
                 <div className="flex items-start justify-between mb-2">
@@ -147,7 +147,7 @@ export const UrgentNeedsSection = ({ onViewAllClick }: UrgentNeedsSectionProps) 
           {remainingCount > 0 && (
             <div
               onClick={onViewAllClick}
-              className="bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group aspect-square"
+              className="bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group min-h-[18rem]"
             >
               <div className="p-4 h-full flex flex-col items-center justify-center text-white">
                 <div className="mb-2">
