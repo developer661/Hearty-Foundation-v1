@@ -136,7 +136,7 @@ export const VolunteerRegistration = ({ onBack, onSuccess }: VolunteerRegistrati
       if (authError) throw authError;
 
       if (authData.user) {
-        await supabase.from('user_profiles').insert([{
+        const { error: profileError } = await supabase.from('user_profiles').upsert({
           id: authData.user.id,
           user_id: authData.user.id,
           full_name: `${formData.first_name} ${formData.last_name}`,
@@ -145,10 +145,11 @@ export const VolunteerRegistration = ({ onBack, onSuccess }: VolunteerRegistrati
           bio: formData.motivation || null,
           category_interests: formData.category_interests,
           verification_status: 'not_verified'
-        }]);
+        }, { onConflict: 'id' });
+        if (profileError) throw profileError;
 
         if (formData.phone || formData.date_of_birth || formData.profession || formData.experience || formData.motivation || formData.category_interests.length > 0) {
-          await supabase.from('volunteer_registrations').insert([{
+          const { error: registrationError } = await supabase.from('volunteer_registrations').insert([{
             full_name: `${formData.first_name} ${formData.last_name}`,
             email: formData.email,
             phone: formData.phone || '',
@@ -159,15 +160,22 @@ export const VolunteerRegistration = ({ onBack, onSuccess }: VolunteerRegistrati
             category_interests: formData.category_interests,
             status: 'pending'
           }]);
+          if (registrationError) throw registrationError;
         }
       }
 
       onSuccess();
     } catch (error: any) {
-      if (error.message?.includes('already registered')) {
+      console.error('Volunteer registration failed:', error);
+      const message: string = error?.message ?? '';
+      if (message.includes('already registered')) {
         setErrors(['This email is already registered. Please try logging in instead.']);
+      } else if (message.toLowerCase().includes('rate limit')) {
+        setErrors(['Too many sign-up attempts. Please wait a few minutes and try again.']);
+      } else if (message.toLowerCase().includes('password')) {
+        setErrors([`Password was rejected: ${message}`]);
       } else {
-        setErrors(['Failed to create account. Please try again.']);
+        setErrors([`Failed to create account: ${message || 'unknown error'}. Please try again.`]);
       }
     } finally {
       setSubmitting(false);
