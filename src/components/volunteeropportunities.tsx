@@ -370,7 +370,7 @@ const OpportunityCard = ({ opp, variant, categoryColor, onApply, showMatchScore 
   const isUrgent = variant === 'urgent';
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1 overflow-hidden ${
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1 overflow-hidden flex flex-col h-full ${
       isUrgent ? 'border-2 border-red-200' : 'border border-gray-200'
     }`}>
       {isUrgent && (
@@ -392,7 +392,7 @@ const OpportunityCard = ({ opp, variant, categoryColor, onApply, showMatchScore 
         </div>
       )}
 
-      <div className="p-6">
+      <div className="p-6 flex flex-col flex-grow">
         {!isUrgent && (
           <div className="flex items-start justify-between mb-4">
             <h4 className="text-xl font-bold text-gray-900 flex-1">{opp.title}</h4>
@@ -421,7 +421,7 @@ const OpportunityCard = ({ opp, variant, categoryColor, onApply, showMatchScore 
           </div>
         )}
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3">{opp.description}</p>
+        <p className="text-gray-600 text-sm mb-4 line-clamp-3 min-h-[3.75rem]">{opp.description}</p>
 
         <div className="space-y-2 mb-4">
           <div className="flex items-start gap-2 text-sm text-gray-700">
@@ -477,9 +477,9 @@ const OpportunityCard = ({ opp, variant, categoryColor, onApply, showMatchScore 
 
         <button
           onClick={onApply}
-          className={`w-full py-3 rounded-lg font-semibold transition-colors ${
+          className={`w-full mt-auto py-3 rounded-lg font-semibold transition-colors ${
             isUrgent
-              ? 'bg-red-600 text-white hover:bg-red-700'
+              ? 'bg-gray-700 text-white hover:bg-gray-800'
               : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
           }`}
         >

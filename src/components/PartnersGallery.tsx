@@ -107,7 +107,7 @@ const PartnerFlipCard = ({ partner }: { partner: Partner }) => {
 export const PartnersGallery = () => {
   return (
     <section className="bg-white py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ zoom: 0.67 }}>
         <div className="text-center mb-8">
           <p className="text-sm font-bold uppercase tracking-widest text-red-600 mb-2">Our partners</p>
           <p className="text-gray-600">Hover over a partner (or tap on mobile) to learn how they support our children.</p>
