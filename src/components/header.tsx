@@ -5,6 +5,7 @@ import { LoginModal } from './LoginModal';
 import { DashboardAccessModal } from './DashboardAccessModal';
 
 interface HeaderProps {
+  onAdminClick?: () => void;
   onJoinVolunteerClick?: () => void;
   onDashboardClick?: () => void;
   onProfileClick?: () => void;
@@ -14,7 +15,7 @@ interface HeaderProps {
   onAboutClick?: () => void;
 }
 
-export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick, onEventsClick, onJoinCareFacilityNgoClick, onJoinBusinessPartnerClick, onAboutClick }: HeaderProps) => {
+export const Header = ({ onAdminClick, onJoinVolunteerClick, onDashboardClick, onProfileClick, onEventsClick, onJoinCareFacilityNgoClick, onJoinBusinessPartnerClick, onAboutClick }: HeaderProps) => {
   const { user, userProfile, signOut } = useAuth();
   const [joinOpen, setJoinOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -208,6 +209,17 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
                     >
                       Volunteer Ranking
                     </button>
+                    {userProfile.platform_role === 'administrator' && (
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          onAdminClick?.();
+                        }}
+                        className="w-full text-left px-4 py-2 text-red-600 font-semibold hover:bg-red-50 transition-colors"
+                      >
+                        Administration
+                      </button>
+                    )}
                     <div className="border-t border-gray-200 my-1"></div>
                     <button
                       onClick={handleLogout}
@@ -432,6 +444,18 @@ export const Header = ({ onJoinVolunteerClick, onDashboardClick, onProfileClick,
                     >
                       Volunteer Ranking
                     </button>
+                    {userProfile.platform_role === 'administrator' && (
+                      <button
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setUserMenuOpen(false);
+                          onAdminClick?.();
+                        }}
+                        className="w-full text-left px-4 py-2 text-red-600 font-semibold hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        Administration
+                      </button>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors flex items-center gap-2"

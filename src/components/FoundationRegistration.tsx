@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Upload, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { assertValidRegistrationDocument, uploadRegistrationDocument } from '../lib/registrationDocuments';
 
 interface FoundationRegistrationProps {
   onBack: () => void;
@@ -57,6 +58,7 @@ export const FoundationRegistration = ({ onBack, onSuccess }: FoundationRegistra
     setIsSubmitting(true);
 
     try {
+      documents.forEach(assertValidRegistrationDocument);
       const { data: registration, error: regError } = await supabase
         .from('foundation_registrations')
         .insert({
@@ -66,7 +68,6 @@ export const FoundationRegistration = ({ onBack, onSuccess }: FoundationRegistra
           address: formData.address,
           krs: formData.krs,
           email: formData.email,
-          password_hash: formData.password,
           status: 'pending'
         })
         .select()
@@ -75,15 +76,17 @@ export const FoundationRegistration = ({ onBack, onSuccess }: FoundationRegistra
       if (regError) throw regError;
 
       for (const file of documents) {
-        await supabase
+        const filePath = await uploadRegistrationDocument(file, registration.id);
+        const { error: docError } = await supabase
           .from('foundation_documents')
           .insert({
             registration_id: registration.id,
             document_type: file.name.split('.').pop() || 'document',
             file_name: file.name,
-            file_url: '',
+            file_url: filePath,
             file_size: file.size
           });
+        if (docError) throw docError;
       }
 
       onSuccess();

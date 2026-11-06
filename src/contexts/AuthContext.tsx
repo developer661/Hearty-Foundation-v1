@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
-interface UserProfile {
+export interface UserProfile {
   id: string;
   full_name: string;
   email: string;
@@ -13,11 +13,13 @@ interface UserProfile {
   points: number;
   avatar_url?: string;
   user_type: 'volunteer' | 'care_facility_ngo' | 'business_partner';
-  verification_status: 'not_verified' | 'in_verification' | 'verified' | 'rejected';
+  verification_status: 'not_verified' | 'in_verification' | 'partially_verified' | 'verified' | 'rejected';
   access_level: 'read_only' | 'full_access';
   org_role: 'org_admin' | 'opportunity_manager' | null;
   organization_id: string | null;
   category_interests: string[];
+  username: string | null;
+  platform_role: 'administrator' | null;
 }
 
 interface AuthContextType {
@@ -25,7 +27,8 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   session: Session | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  isPlatformAdmin: boolean;
+  signIn: (identifier: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -44,26 +47,38 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching user profile:', error);
+    return null;
+  }
+
+  return data as UserProfile | null;
+};
+
+const resolveLoginEmail = async (identifier: string): Promise<string | null> => {
+  const trimmed = identifier.trim();
+  if (trimmed.includes('@')) return trimmed;
+
+  const { data, error } = await supabase.rpc('resolve_login_email', { p_identifier: trimmed });
+  if (error) {
+    console.error('Error resolving username:', error);
+    return null;
+  }
+  return typeof data === 'string' ? data : null;
+};
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const fetchUserProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error fetching user profile:', error);
-      return null;
-    }
-
-    return data;
-  };
 
   const refreshProfile = async () => {
     if (user) {
@@ -75,51 +90,50 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
-    setLoading(false);
+    let active = true;
+
+    const applySession = (nextSession: Session | null) => {
+      if (!active) return;
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+      if (!nextSession?.user) {
+        setUserProfile(null);
+        return;
+      }
+      const userId = nextSession.user.id;
+      (async () => {
+        const profile = await fetchUserProfile(userId);
+        if (active) setUserProfile(profile);
+      })();
+    };
+
+    supabase.auth.getSession().then(({ data }) => {
+      applySession(data.session);
+      if (active) setLoading(false);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      applySession(nextSession);
+    });
+
+    return () => {
+      active = false;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
-  const signIn = async (email: string, _password: string) => {
-    try {
-      const { data: profile, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('email', email)
-        .maybeSingle();
-
-      if (profileError) {
-        throw new Error('Profile not found');
-      }
-
-      if (!profile) {
-        throw new Error('No user found with this email');
-      }
-
-      const mockUser = {
-        id: profile.id,
-        email: profile.email,
-        aud: 'authenticated',
-        role: 'authenticated',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      } as User;
-
-      const mockSession = {
-        user: mockUser,
-        access_token: 'demo-token',
-        refresh_token: 'demo-refresh',
-        expires_in: 3600,
-        expires_at: Date.now() + 3600000,
-        token_type: 'bearer',
-      } as Session;
-
-      setUser(mockUser);
-      setUserProfile(profile);
-      setSession(mockSession);
-
-      return { error: null };
-    } catch (error) {
-      return { error: error as Error };
+  const signIn = async (identifier: string, password: string) => {
+    const email = await resolveLoginEmail(identifier);
+    if (!email) {
+      return { error: new Error('Invalid username/email or password.') };
     }
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      return { error: new Error('Invalid username/email or password.') };
+    }
+
+    return { error: null };
   };
 
   const signOut = async () => {
@@ -134,6 +148,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     userProfile,
     session,
     loading,
+    isPlatformAdmin: userProfile?.platform_role === 'administrator',
     signIn,
     signOut,
     refreshProfile,

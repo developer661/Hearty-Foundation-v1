@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Upload, FileText, Plus, X, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { assertValidRegistrationDocument, uploadRegistrationDocument } from '../lib/registrationDocuments';
 
 interface CareFacilityRegistrationProps {
   onBack: () => void;
@@ -98,6 +99,7 @@ export const CareFacilityRegistration = ({ onBack, onSuccess }: CareFacilityRegi
     setIsSubmitting(true);
 
     try {
+      documents.forEach(assertValidRegistrationDocument);
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -136,7 +138,6 @@ export const CareFacilityRegistration = ({ onBack, onSuccess }: CareFacilityRegi
             secondary_address: showSecondaryAddress ? formData.secondaryAddress : null,
             krs: formData.krs || null,
             email: formData.email,
-            password_hash: formData.password,
             status: 'pending'
           })
           .select()
@@ -145,15 +146,17 @@ export const CareFacilityRegistration = ({ onBack, onSuccess }: CareFacilityRegi
         if (regError) throw regError;
 
         for (const file of documents) {
-          await supabase
+          const filePath = await uploadRegistrationDocument(file, registration.id);
+          const { error: docError } = await supabase
             .from('care_facility_documents')
             .insert({
               registration_id: registration.id,
               document_type: file.name.split('.').pop() || 'document',
               file_name: file.name,
-              file_url: '',
+              file_url: filePath,
               file_size: file.size
             });
+          if (docError) throw docError;
         }
       }
 

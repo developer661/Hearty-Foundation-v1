@@ -16,10 +16,11 @@ import { PartnersGallery } from './components/PartnersGallery';
 import { OnboardingModal } from './components/OnboardingModal';
 import { AboutFoundationPanel } from './components/AboutFoundationPanel';
 import { SuccessStoriesPanel } from './components/SuccessStoriesPanel';
+import { AdminPage } from './components/admin/AdminPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 
-type View = 'home' | 'opportunities' | 'registration' | 'contact' | 'dashboard' | 'profile' | 'success' | 'events' | 'care-facility-ngo-registration' | 'business-partner-registration';
+type View = 'home' | 'opportunities' | 'registration' | 'contact' | 'dashboard' | 'profile' | 'success' | 'events' | 'care-facility-ngo-registration' | 'business-partner-registration' | 'admin';
 
 /** Checks if a verified volunteer needs to see the onboarding modal and shows it once. */
 const OnboardingGate = ({ children }: { children: React.ReactNode }) => {
@@ -157,6 +158,14 @@ function App() {
     );
   }
 
+  if (currentView === 'admin') {
+    return (
+      <AuthProvider>
+        <AdminPage onExit={() => handleViewChange('home')} />
+      </AuthProvider>
+    );
+  }
+
   if (currentView === 'success') {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-8">
@@ -177,6 +186,7 @@ function App() {
             onJoinCareFacilityNgoClick={() => handleViewChange('care-facility-ngo-registration')}
             onJoinBusinessPartnerClick={() => handleViewChange('business-partner-registration')}
             onAboutClick={() => setShowAbout(true)}
+            onAdminClick={() => handleViewChange('admin')}
           />
 
           {showAbout && <AboutFoundationPanel onClose={() => setShowAbout(false)} />}

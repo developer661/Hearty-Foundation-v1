@@ -9,7 +9,7 @@ interface LoginModalProps {
 
 export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const { signIn } = useAuth();
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,13 +21,13 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
     setError('');
     setLoading(true);
 
-    const { error: signInError } = await signIn(email, password);
+    const { error: signInError } = await signIn(identifier, password);
 
     if (signInError) {
       setError(signInError.message || 'Failed to log in. Please check your credentials.');
       setLoading(false);
     } else {
-      setEmail('');
+      setIdentifier('');
       setPassword('');
       setLoading(false);
       onClose();
@@ -71,17 +71,18 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
+            <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-1">
+              Email or Username
             </label>
             <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              id="identifier"
+              autoComplete="username"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all"
-              placeholder="anna.kowalska@example.com"
+              placeholder="Enter your email or username"
               disabled={loading}
             />
           </div>
@@ -96,6 +97,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all"
               placeholder="Enter your password"
               disabled={loading}
@@ -110,15 +112,6 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
-          </div>
-
-          <div className="text-center text-sm text-gray-600 pt-2">
-            <p className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-blue-700 text-left">
-              <strong>Demo Accounts:</strong><br />
-              <span className="text-xs">Volunteer:</span> anna.kowalska@example.com / volunteer123<br />
-              <span className="text-xs">Business Partner:</span> sponsor@example.com / sponsor123<br />
-              <span className="text-xs">Care Facility:</span> sunshine@example.com / sunshine123
-            </p>
           </div>
         </form>
       </div>
