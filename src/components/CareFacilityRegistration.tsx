@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Upload, FileText, Plus, X, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { notifyAdministrators } from '../lib/adminNotifications';
 import { assertValidRegistrationDocument, uploadRegistrationDocument } from '../lib/registrationDocuments';
 
 interface CareFacilityRegistrationProps {
@@ -160,6 +161,7 @@ export const CareFacilityRegistration = ({ onBack, onSuccess }: CareFacilityRegi
         }
       }
 
+      notifyAdministrators();
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');

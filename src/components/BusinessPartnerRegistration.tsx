@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Upload, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { notifyAdministrators } from '../lib/adminNotifications';
 
 interface BusinessPartnerRegistrationProps {
   onBack: () => void;
@@ -103,6 +104,7 @@ export const BusinessPartnerRegistration = ({ onBack, onSuccess }: BusinessPartn
         if (regError) throw regError;
       }
 
+      notifyAdministrators();
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');

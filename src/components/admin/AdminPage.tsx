@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LogIn, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { readAdminDeepLink } from '../../lib/adminDeepLink';
+import { notifyAdministrators } from '../../lib/adminNotifications';
 import { LoginModal } from '../LoginModal';
 import { AdminHeader } from './AdminHeader';
 import { AdminDashboard } from './AdminDashboard';
@@ -29,12 +31,17 @@ const NAV_ITEMS: { id: AdminSection; label: string }[] = [
 export const AdminPage = ({ onExit }: { onExit: () => void }) => {
   const { user, userProfile, loading, isPlatformAdmin, signOut } = useAuth();
   const pendingCount = usePendingRequestCount();
+  const [deepLinkRequestId] = useState<string | null>(() => readAdminDeepLink()?.requestId ?? null);
   const [showLogin, setShowLogin] = useState(false);
-  const [section, setSection] = useState<AdminSection>('dashboard');
+  const [section, setSection] = useState<AdminSection>(() => (deepLinkRequestId ? 'queue' : 'dashboard'));
   const [queueType, setQueueType] = useState<RequestType | 'all'>('all');
   const [queueStatus, setQueueStatus] = useState<RequestStatus | 'all'>('pending');
   const [usersTab, setUsersTab] = useState<UsersTab>('all');
-  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(deepLinkRequestId);
+
+  useEffect(() => {
+    if (isPlatformAdmin) notifyAdministrators();
+  }, [isPlatformAdmin]);
 
   const navigate = (target: AdminSection, options: NavigateOptions = {}) => {
     if (options.queueType) setQueueType(options.queueType);

@@ -19,6 +19,7 @@ import { SuccessStoriesPanel } from './components/SuccessStoriesPanel';
 import { AdminPage } from './components/admin/AdminPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
+import { readAdminDeepLink } from './lib/adminDeepLink';
 
 type View = 'home' | 'opportunities' | 'registration' | 'contact' | 'dashboard' | 'profile' | 'success' | 'events' | 'care-facility-ngo-registration' | 'business-partner-registration' | 'admin';
 
@@ -60,7 +61,7 @@ const OnboardingGate = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
-  const [currentView, setCurrentView] = useState<View>('home');
+  const [currentView, setCurrentView] = useState<View>(() => (readAdminDeepLink() ? 'admin' : 'home'));
   const [showAbout, setShowAbout] = useState(false);
   const [showStories, setShowStories] = useState(false);
 

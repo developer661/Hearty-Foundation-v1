@@ -1,6 +1,7 @@
 import { useState, ChangeEvent } from 'react';
 import { ArrowLeft, Upload, X, CheckCircle, AlertCircle, ChevronDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { notifyAdministrators } from '../lib/adminNotifications';
 import { VOLUNTEER_CATEGORIES } from '../lib/categories';
 
 interface VolunteerRegistrationProps {
@@ -164,6 +165,7 @@ export const VolunteerRegistration = ({ onBack, onSuccess }: VolunteerRegistrati
         }
       }
 
+      notifyAdministrators();
       onSuccess();
     } catch (error: any) {
       console.error('Volunteer registration failed:', error);

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Upload, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { notifyAdministrators } from '../lib/adminNotifications';
 import { assertValidRegistrationDocument, uploadRegistrationDocument } from '../lib/registrationDocuments';
 
 interface FoundationRegistrationProps {
@@ -89,6 +90,7 @@ export const FoundationRegistration = ({ onBack, onSuccess }: FoundationRegistra
         if (docError) throw docError;
       }
 
+      notifyAdministrators();
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');

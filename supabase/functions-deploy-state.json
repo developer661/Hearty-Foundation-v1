@@ -1,0 +1,9 @@
+{
+  "projectId": "61441661",
+  "functions": {
+    "send-admin-notifications": {
+      "hasChanged": false,
+      "hash": "1c662023bf9ffe731bfc52b1e0846638fd32a26b7ca2978f5ab8c6f7fe0fac67"
+    }
+  }
+}
